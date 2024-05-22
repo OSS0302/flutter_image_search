@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_image_search/data/model/pixabay_item.dart';
-import 'package:flutter_image_search/data/repository/pixabay_repository_impl.dart';
+import 'package:flutter_image_search/presentation/pixabay/pixabay_view_model.dart';
 import 'package:flutter_image_search/presentation/widget/pixabay_widget.dart';
 
 class PixabayScreen extends StatefulWidget {
@@ -12,6 +11,7 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final textController = TextEditingController();
+  final pixbayViewModel = PixabayViewModel();
 
   @override
   void dispose() {
@@ -53,7 +53,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       Icons.search_rounded,
                       color: Colors.tealAccent,
                     ),
-                    onPressed: () {
+                    onPressed: () async{
+                      await pixbayViewModel.fetchImage(textController.text);
                       setState(() {});
                     },
                   ),
@@ -62,27 +63,29 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              FutureBuilder<List<PixabayItem>>(
-                  future: PixabayRepositoryImpl()
-                      .getPixabayItem(textController.text),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    final pixabayItem = snapshot.data!;
-                    return Expanded(
+              pixbayViewModel.isLoading
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('잠시만 기다려 주세요 '),
+                        ],
+                      ),
+                    )
+                  : Expanded(
                       child: GridView.builder(
-                        itemCount: pixabayItem.length,
+                        itemCount: pixbayViewModel.pixabayItem.length,
                         itemBuilder: (context, index) {
-                          final pixabayItems = pixabayItem[index];
+                          final pixabayItems =
+                              pixbayViewModel.pixabayItem[index];
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4,mainAxisSpacing: 32,crossAxisSpacing: 32),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 32,
+                            crossAxisSpacing: 32),
                       ),
-                    );
-                  }),
+                    ),
             ],
           ),
         ),
