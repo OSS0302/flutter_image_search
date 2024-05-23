@@ -1,7 +1,8 @@
-import 'package:flutter_image_search/data/repository/pixabay_repository.dart';
-import 'package:flutter_image_search/data/repository/pixabay_repository_impl.dart';
-import 'package:flutter_image_search/presentation/pixabay/pixabay_view_model.dart';
 import 'package:get_it/get_it.dart';
+
+import '../data/repository/pixabay_repository.dart';
+import '../data/repository/pixabay_repository_impl.dart';
+import '../presentation/pixabay/pixabay_view_model.dart';
 
 final getIt = GetIt.instance;
 

@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_image_search/presentation/pixabay/pixabay_view_model.dart';
-import 'package:flutter_image_search/presentation/widget/pixabay_widget.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:provider/provider.dart';
+
+import '../widget/pixabay_widget.dart';
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
 
@@ -59,12 +60,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     ),
                     onPressed: () async {
                      final result =  await pixbayViewModel.fetchImage(textController.text);
-                     if(result == false) {
-                       const snackBar = SnackBar(content: Text('오류'));
-                      if(mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                     }
+
                       setState(() {});
                     },
                   ),

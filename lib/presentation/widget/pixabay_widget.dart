@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_image_search/data/model/pixabay_item.dart';
+
+import '../../data/model/pixabay_item.dart';
 
 class PixabayWidget extends StatelessWidget {
   final PixabayItem pixabayItems;
