@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_state.dart';
 
 import '../../data/core/result.dart';
@@ -22,6 +23,10 @@ class PixabayViewModel extends ChangeNotifier {
 
   PixabayState get state => _state;
 
+  final _eventController = StreamController<PixabayEvent>();
+
+  Stream<PixabayEvent> get eventStream => _eventController.stream;
+
   Future<void> fetchImage(String query) async {
     _state = state.copyWith(
       isLoading: true,
@@ -36,6 +41,8 @@ class PixabayViewModel extends ChangeNotifier {
           isLoading: false,
           pixabayItem: result.data.toList(),
         );
+        _eventController.add(PixabayEvent.showSnackBar('성공!!'));
+        _eventController.add(PixabayEvent.showDialog('다이얼로그'));
         notifyListeners();
       case Error<List<PixabayItem>>():
         _state = state.copyWith(
