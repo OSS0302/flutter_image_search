@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_image_search/presentation/pixabay/pixabay_view_model.dart';
 import 'package:flutter_image_search/presentation/widget/pixabay_widget.dart';
@@ -22,6 +24,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
   @override
   Widget build(BuildContext context) {
     final pixbayViewModel = context.read<PixabayViewModel>();
+    final state = pixbayViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: Text('이미지 검색앱'),
@@ -64,7 +67,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              pixbayViewModel.isLoading
+              state.isLoading
                   ? Center(
                       child: Column(
                         children: [
@@ -75,10 +78,10 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     )
                   : Expanded(
                       child: GridView.builder(
-                        itemCount: pixbayViewModel.pixabayItem.length,
+                        itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
                           final pixabayItems =
-                              pixbayViewModel.pixabayItem[index];
+                          state.pixabayItem[index];
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
