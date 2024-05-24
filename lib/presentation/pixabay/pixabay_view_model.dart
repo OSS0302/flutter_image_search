@@ -1,20 +1,19 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:image_search_app/domain/use_case/search_use_case.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_state.dart';
 
 import '../../data/core/result.dart';
-import '../../data/model/pixabay_item.dart';
-import '../../data/repository/pixabay_repository.dart';
+import '../../domain/model/pixabay_item.dart';
 
 class PixabayViewModel extends ChangeNotifier {
-  final PixabayRepository _repository;
+  final SearchUseCase _searchUseCase;
 
-  PixabayViewModel({
-    required PixabayRepository repository,
-  }) : _repository = repository;
+   PixabayViewModel({
+    required SearchUseCase searchUseCase,
+  }) : _searchUseCase = searchUseCase;
 
   PixabayState _state = PixabayState(
     pixabayItem: List.unmodifiable([]),
@@ -33,9 +32,8 @@ class PixabayViewModel extends ChangeNotifier {
     );
     notifyListeners();
 
-    final  result = await _repository.getPixabayItem(query);
+    final  result = await _searchUseCase.execute(query);
     switch(result) {
-
       case Success<List<PixabayItem>>():
         _state = state.copyWith(
           isLoading: false,
@@ -46,13 +44,11 @@ class PixabayViewModel extends ChangeNotifier {
         notifyListeners();
       case Error<List<PixabayItem>>():
         _state = state.copyWith(
-            isLoading: false,
+          isLoading: false,
         );
         notifyListeners();
     }
     notifyListeners();
-
-
-
+    }
   }
-}
+

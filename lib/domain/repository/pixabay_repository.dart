@@ -1,6 +1,6 @@
 
 
-import '../core/result.dart';
+import '../../data/core/result.dart';
 import '../model/pixabay_item.dart';
 
 abstract interface class PixabayRepository {

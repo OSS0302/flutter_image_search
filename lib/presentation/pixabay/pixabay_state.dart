@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../data/model/pixabay_item.dart';
+import '../../domain/model/pixabay_item.dart';
 
 part 'pixabay_state.freezed.dart';
 
