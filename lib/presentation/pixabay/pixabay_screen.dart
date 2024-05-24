@@ -105,22 +105,52 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              state.isLoading
-                  ? Center(
+              if (state.isLoading) Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
                           Text('잠시만 기다려 주세요'),
                         ],
                       ),
-                    )
-                  : Expanded(
+                    ) else Expanded(
                       child: GridView.builder(
                         itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
                           final pixabayItems =
                           state.pixabayItem[index];
-                          return PixabayWidget(pixabayItems: pixabayItems);
+                          return GestureDetector(
+                            onTap: () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('이미지 검색앱'),
+                                  content: Text('자세히 보시 겠 습니까'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.tealAccent,
+                                      ),
+                                      child: TextButton(onPressed: () {
+                                        context.push('/detail', extra: pixabayItems);
+                                        context.pop();
+                                      }, child: Text('확인')),
+                                    ),Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.tealAccent,
+                                      ),
+                                      child: TextButton(onPressed: () {
+                                        context.pop();
+                                      }, child: Text('취소')),
+                                    )
+                                  ],
+
+                                );
+                              }).then((value) {
+                                if(value != null && value){}
+                              });
+                            },
+                              child: PixabayWidget(pixabayItems: pixabayItems));
                         },
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
