@@ -127,7 +127,47 @@ class _ImageScreenState extends State<ImageScreen> {
                         itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
                           final imageItems = state.imageItem[index];
-                          return ImageWidget(imageItem: imageItems);
+                          return GestureDetector(
+                            onTap:  () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('image Search app',style: TextStyle(color: Colors.redAccent),),
+                                  content: Text('image data complete'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.push('/detail', extra: imageItems);
+                                          context.pop();
+                                        },
+                                        child: Text('확인'),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: Text('취소'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value){
+
+                                }
+                              });
+                            },
+                              child: ImageWidget(imageItem: imageItems));
                         },
                       ),
                     ),
