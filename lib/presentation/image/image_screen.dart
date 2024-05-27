@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/image_repository_impl.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
+import 'package:provider/provider.dart';
 
-import '../../data/model/image_item.dart';
+import 'image_event.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -14,16 +17,54 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
-  final imageViewModel = ImageViewModel();
+  StreamSubscription<ImageEvent>? subscription;
+
+  @override
+  void initState() {
+    subscription = context.read<ImageViewModel>().eventStream.listen((event) {
+      switch (event) {
+        case ShowSnackBar():
+          final snackBar = SnackBar(content: Text(event.message));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        case ShowDialog():
+          showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text('image Search app',style: TextStyle(color: Colors.redAccent),),
+                  content: Text('image data complete'),
+                  actions: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.redAccent,
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          context.pop();
+                        },
+                        child: Text('확인'),
+                      ),
+                    ),
+                  ],
+                );
+              });
+      }
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
+    subscription?.cancel();
     imageSearchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final imageViewModel = context.read<ImageViewModel>();
+    final state = imageViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: const Text('image Search app'),
@@ -57,7 +98,9 @@ class _ImageScreenState extends State<ImageScreen> {
                       color: Colors.redAccent,
                     ),
                     onPressed: () async {
-                      await imageViewModel.fetchImage(imageSearchController.text);
+                      await imageViewModel
+                          .fetchImage(imageSearchController.text);
+
                       setState(() {});
                     },
                   ),
@@ -66,12 +109,12 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              imageViewModel.isLoading
+              state.isLoading
                   ? Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
-                          Text('잠시만 기다려주세요'),
+                          Text('잠시만 기다려 주세요'),
                         ],
                       ),
                     )
@@ -81,10 +124,50 @@ class _ImageScreenState extends State<ImageScreen> {
                             crossAxisCount: 4,
                             crossAxisSpacing: 32,
                             mainAxisSpacing: 32),
-                        itemCount: imageViewModel.imageItem.length,
+                        itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
-                          final imageItems = imageViewModel.imageItem[index];
-                          return ImageWidget(imageItem: imageItems);
+                          final imageItems = state.imageItem[index];
+                          return GestureDetector(
+                            onTap:  () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('image Search app',style: TextStyle(color: Colors.redAccent),),
+                                  content: Text('image data complete'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.push('/detail', extra: imageItems);
+                                          context.pop();
+                                        },
+                                        child: Text('확인'),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: Text('취소'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value){
+
+                                }
+                              });
+                            },
+                              child: ImageWidget(imageItem: imageItems));
                         },
                       ),
                     ),
