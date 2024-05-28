@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/presentation/widget/pixabay_widget.dart';
 import 'package:provider/provider.dart';
@@ -56,15 +55,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.red,
                     ),
                     onPressed: () async {
-                      final result = await pixabayViewModel
-                          .fetchImaage(textEditingController.text);
-                      if (result == false) {
-                        const snackBar =
-                            SnackBar(content: Text('인터넷이 연결 안되거나 오류'));
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      }
+                      await pixabayViewModel.fetchImage(textEditingController.text);
+
                       setState(() {});
                     },
                   ),

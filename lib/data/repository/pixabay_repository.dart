@@ -1,5 +1,6 @@
+import '../../core/result.dart';
 import '../model/pixabay_item.dart';
 
 abstract interface class PixabayRepository {
-  Future<List<PixabayItem>> getPixabayItem(String query);
+  Future<Result<List<PixabayItem>>> getPixabayItem(String query);
 }
