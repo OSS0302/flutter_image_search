@@ -56,8 +56,15 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.red,
                     ),
                     onPressed: () async {
-                      await pixabayViewModel
+                      final result = await pixabayViewModel
                           .fetchImaage(textEditingController.text);
+                      if (result == false) {
+                        const snackBar =
+                            SnackBar(content: Text('인터넷이 연결 안되거나 오류'));
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
                       setState(() {});
                     },
                   ),
@@ -83,8 +90,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                             crossAxisSpacing: 32),
                         itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
-                          final pixabayItems =
-                              state.pixabayItem[index];
+                          final pixabayItems = state.pixabayItem[index];
                           return PixabayWidget(pixabayItem: pixabayItems);
                         },
                       ),
