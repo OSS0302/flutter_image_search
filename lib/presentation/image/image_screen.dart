@@ -23,36 +23,37 @@ class _ImageScreenState extends State<ImageScreen> {
   void initState() {
     Future.microtask(() {
       subscription = context.read<ImageViewModel>().eventStream.listen((event) {
-        switch(event) {
-
+        switch (event) {
           case ShowSnackBar():
             final snackBar = SnackBar(content: Text(event.message));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           case ShowDialog():
-            showDialog(context: context, builder: (context){
-              return AlertDialog(
-                title: Text('이미지 검색 앱'),
-                content: Text('이미지 가져오기 완료'),
-                actions: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.tealAccent,
-                    ),
-                    
-                    child: TextButton(onPressed: () {
-                      context.pop();
-                    }, child: Text('확인')),
-                  )
-                ],
-              );
-            });
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('이미지 검색 앱'),
+                    content: const Text('이미지 가져오기 완료'),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.tealAccent,
+                        ),
+                        child: TextButton(
+                            onPressed: () {
+                              context.pop();
+                            },
+                            child: const Text('확인')),
+                      )
+                    ],
+                  );
+                });
         }
       });
     });
     super.initState();
   }
-
 
   @override
   void dispose() {
@@ -95,7 +96,7 @@ class _ImageScreenState extends State<ImageScreen> {
                     icon: const Icon(Icons.ads_click_rounded),
                     color: Colors.tealAccent,
                     onPressed: () async {
-                       await imageViewModel
+                      await imageViewModel
                           .fetchImage(imageSearchController.text);
 
                       setState(() {});
@@ -106,16 +107,14 @@ class _ImageScreenState extends State<ImageScreen> {
               const SizedBox(
                 height: 24,
               ),
-              state.isLoading
-                  ? Center(
+              if (state.isLoading) const Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
                           Text('잠시만 기다려 주세요'),
                         ],
                       ),
-                    )
-                  : Expanded(
+                    ) else Expanded(
                       child: GridView.builder(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -125,7 +124,52 @@ class _ImageScreenState extends State<ImageScreen> {
                         itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
                           final imageItems = state.imageItem[index];
-                          return ImageWidget(imageItem: imageItems);
+                          return GestureDetector(
+                              onTap: () async {
+                                await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('이미지 검색 앱'),
+                                        content: const Text('이미지를 자세히 보시겠습니까?'),
+                                        actions: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.tealAccent,
+                                            ),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                context.push('/detail',
+                                                    extra: imageItems);
+                                                context.pop();
+                                              },
+                                              child: const Text('확인'),
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.tealAccent,
+                                            ),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                context.pop();
+                                              },
+                                              child: const Text('취소'),
+                                            ),
+                                          )
+                                        ],
+                                      );
+                                    }).then((value) {
+                                      if(value !=null && value){
+
+                                      }
+                                    });
+                              },
+                              child: ImageWidget(imageItem: imageItems));
                         },
                       ),
                     ),
