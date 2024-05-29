@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/image_repository_impl.dart';
+import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
 
-import '../../data/model/image_item.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -13,6 +12,7 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
+  final imageViewModel = ImageViewModel();
 
   @override
   void dispose() {
@@ -36,58 +36,54 @@ class _ImageScreenState extends State<ImageScreen> {
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       width: 2,
                       color: Colors.tealAccent,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       width: 2,
                       color: Colors.tealAccent,
                     ),
                   ),
                   hintText: '이미지 검색앱',
                   suffixIcon: IconButton(
-                    icon: Icon(Icons.ads_click_rounded),
+                    icon: const Icon(Icons.ads_click_rounded),
                     color: Colors.tealAccent,
-                    onPressed: () {
+                    onPressed: () async{
+                      await imageViewModel.fetchImage(imageSearchController.text);
                       setState(() {});
                     },
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
-              FutureBuilder<List<ImageItem>>(
-                future: ImageRepositoryImpl()
-                    .getImageItems(imageSearchController.text),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
+              imageViewModel.isLoading
+                  ? const Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
                           Text('잠시만 기다려 주세요'),
                         ],
                       ),
-                    );
-                  }
-                  final imageItem = snapshot.data!;
-                  return Expanded(child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
-                          mainAxisSpacing: 32,
-                          crossAxisSpacing: 32),
-                      itemCount: imageItem.length,
-                      itemBuilder: (context, index) {
-                        final imageItems = imageItem[index];
-                        return ImageWidget(imageItem: imageItems);
-                      },),);
-                },
-              ),
+                    )
+                  : Expanded(
+                      child: GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 32,
+                            crossAxisSpacing: 32),
+                        itemCount: imageViewModel.imageItem.length,
+                        itemBuilder: (context, index) {
+                          final imageItems = imageViewModel.imageItem[index];
+                          return ImageWidget(imageItem: imageItems);
+                        },
+                      ),
+                    ),
             ],
           ),
         ),
