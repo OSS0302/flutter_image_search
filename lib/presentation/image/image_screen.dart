@@ -13,7 +13,6 @@ class ImageScreen extends StatefulWidget {
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
 
-
   @override
   void dispose() {
     imageSearchController.dispose();
@@ -55,8 +54,14 @@ class _ImageScreenState extends State<ImageScreen> {
                     icon: const Icon(Icons.ads_click_rounded),
                     color: Colors.tealAccent,
                     onPressed: () async {
-                      await imageViewModel
+                      final result = await imageViewModel
                           .fetchImage(imageSearchController.text);
+                      if (result == false) {
+                        const snackBar = SnackBar(content: Text('오류'));
+                        if(mounted){
+                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
                       setState(() {});
                     },
                   ),
