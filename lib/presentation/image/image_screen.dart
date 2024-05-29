@@ -23,6 +23,7 @@ class _ImageScreenState extends State<ImageScreen> {
   @override
   Widget build(BuildContext context) {
     final imageViewModel = context.read<ImageViewModel>();
+    final state = imageViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: const Text('이미지 검색앱'),
@@ -64,7 +65,7 @@ class _ImageScreenState extends State<ImageScreen> {
               const SizedBox(
                 height: 24,
               ),
-              imageViewModel.isLoading
+              state.isLoading
                   ? Center(
                       child: Column(
                         children: [
@@ -80,9 +81,9 @@ class _ImageScreenState extends State<ImageScreen> {
                                 crossAxisCount: 4,
                                 mainAxisSpacing: 32,
                                 crossAxisSpacing: 32),
-                        itemCount: imageViewModel.imageItem.length,
+                        itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
-                          final imageItems = imageViewModel.imageItem[index];
+                          final imageItems = state.imageItem[index];
                           return ImageWidget(imageItem: imageItems);
                         },
                       ),
