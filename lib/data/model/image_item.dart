@@ -1,63 +1,18 @@
-class ImageItem {
-  final String imageUrl;
-  final String tags;
-  final int id;
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
 
-//<editor-fold desc="Data Methods">
-  const ImageItem({
-    required this.imageUrl,
-    required this.tags,
-    required this.id,
-  });
+part 'image_item.freezed.dart';
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is ImageItem &&
-          runtimeType == other.runtimeType &&
-          imageUrl == other.imageUrl &&
-          tags == other.tags &&
-          id == other.id);
+part 'image_item.g.dart';
 
-  @override
-  int get hashCode => imageUrl.hashCode ^ tags.hashCode ^ id.hashCode;
+@freezed
+class ImageItem with _$ImageItem {
+  const factory ImageItem({
+    required String imageUrl,
+    required String tags,
+    required int id,
 
-  @override
-  String toString() {
-    return 'ImageItem{' +
-        ' imageUrl: $imageUrl,' +
-        ' tags: $tags,' +
-        ' id: $id,' +
-        '}';
-  }
+  }) = _ImageItem;
 
-  ImageItem copyWith({
-    String? imageUrl,
-    String? tags,
-    int? id,
-  }) {
-    return ImageItem(
-      imageUrl: imageUrl ?? this.imageUrl,
-      tags: tags ?? this.tags,
-      id: id ?? this.id,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'imageUrl': this.imageUrl,
-      'tags': this.tags,
-      'id': this.id,
-    };
-  }
-
-  factory ImageItem.fromJson(Map<String, dynamic> json) {
-    return ImageItem(
-      imageUrl: json['imageUrl'] as String,
-      tags: json['tags'] as String,
-      id: json['id'] as int,
-    );
-  }
-
-//</editor-fold>
+  factory ImageItem.fromJson(Map<String, Object?> json) => _$ImageItemFromJson(json);
 }
