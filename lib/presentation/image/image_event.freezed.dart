@@ -3,7 +3,7 @@
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
-part of 'pixabay_event.dart';
+part of 'image_event.dart';
 
 // **************************************************************************
 // FreezedGenerator
@@ -15,7 +15,7 @@ final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
-mixin _$PixabayEvent<T> {
+mixin _$ImageEvent<T> {
   String get message => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
@@ -57,23 +57,23 @@ mixin _$PixabayEvent<T> {
       throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
-  $PixabayEventCopyWith<T, PixabayEvent<T>> get copyWith =>
+  $ImageEventCopyWith<T, ImageEvent<T>> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
 /// @nodoc
-abstract class $PixabayEventCopyWith<T, $Res> {
-  factory $PixabayEventCopyWith(
-          PixabayEvent<T> value, $Res Function(PixabayEvent<T>) then) =
-      _$PixabayEventCopyWithImpl<T, $Res, PixabayEvent<T>>;
+abstract class $ImageEventCopyWith<T, $Res> {
+  factory $ImageEventCopyWith(
+          ImageEvent<T> value, $Res Function(ImageEvent<T>) then) =
+      _$ImageEventCopyWithImpl<T, $Res, ImageEvent<T>>;
   @useResult
   $Res call({String message});
 }
 
 /// @nodoc
-class _$PixabayEventCopyWithImpl<T, $Res, $Val extends PixabayEvent<T>>
-    implements $PixabayEventCopyWith<T, $Res> {
-  _$PixabayEventCopyWithImpl(this._value, this._then);
+class _$ImageEventCopyWithImpl<T, $Res, $Val extends ImageEvent<T>>
+    implements $ImageEventCopyWith<T, $Res> {
+  _$ImageEventCopyWithImpl(this._value, this._then);
 
   // ignore: unused_field
   final $Val _value;
@@ -96,7 +96,7 @@ class _$PixabayEventCopyWithImpl<T, $Res, $Val extends PixabayEvent<T>>
 
 /// @nodoc
 abstract class _$$ShowSnackBarImplCopyWith<T, $Res>
-    implements $PixabayEventCopyWith<T, $Res> {
+    implements $ImageEventCopyWith<T, $Res> {
   factory _$$ShowSnackBarImplCopyWith(_$ShowSnackBarImpl<T> value,
           $Res Function(_$ShowSnackBarImpl<T>) then) =
       __$$ShowSnackBarImplCopyWithImpl<T, $Res>;
@@ -107,7 +107,7 @@ abstract class _$$ShowSnackBarImplCopyWith<T, $Res>
 
 /// @nodoc
 class __$$ShowSnackBarImplCopyWithImpl<T, $Res>
-    extends _$PixabayEventCopyWithImpl<T, $Res, _$ShowSnackBarImpl<T>>
+    extends _$ImageEventCopyWithImpl<T, $Res, _$ShowSnackBarImpl<T>>
     implements _$$ShowSnackBarImplCopyWith<T, $Res> {
   __$$ShowSnackBarImplCopyWithImpl(
       _$ShowSnackBarImpl<T> _value, $Res Function(_$ShowSnackBarImpl<T>) _then)
@@ -137,7 +137,7 @@ class _$ShowSnackBarImpl<T> implements ShowSnackBar<T> {
 
   @override
   String toString() {
-    return 'PixabayEvent<$T>.showSnackBar(message: $message)';
+    return 'ImageEvent<$T>.showSnackBar(message: $message)';
   }
 
   @override
@@ -221,7 +221,7 @@ class _$ShowSnackBarImpl<T> implements ShowSnackBar<T> {
   }
 }
 
-abstract class ShowSnackBar<T> implements PixabayEvent<T> {
+abstract class ShowSnackBar<T> implements ImageEvent<T> {
   const factory ShowSnackBar(final String message) = _$ShowSnackBarImpl<T>;
 
   @override
@@ -234,7 +234,7 @@ abstract class ShowSnackBar<T> implements PixabayEvent<T> {
 
 /// @nodoc
 abstract class _$$ShowDialogImplCopyWith<T, $Res>
-    implements $PixabayEventCopyWith<T, $Res> {
+    implements $ImageEventCopyWith<T, $Res> {
   factory _$$ShowDialogImplCopyWith(
           _$ShowDialogImpl<T> value, $Res Function(_$ShowDialogImpl<T>) then) =
       __$$ShowDialogImplCopyWithImpl<T, $Res>;
@@ -245,7 +245,7 @@ abstract class _$$ShowDialogImplCopyWith<T, $Res>
 
 /// @nodoc
 class __$$ShowDialogImplCopyWithImpl<T, $Res>
-    extends _$PixabayEventCopyWithImpl<T, $Res, _$ShowDialogImpl<T>>
+    extends _$ImageEventCopyWithImpl<T, $Res, _$ShowDialogImpl<T>>
     implements _$$ShowDialogImplCopyWith<T, $Res> {
   __$$ShowDialogImplCopyWithImpl(
       _$ShowDialogImpl<T> _value, $Res Function(_$ShowDialogImpl<T>) _then)
@@ -275,7 +275,7 @@ class _$ShowDialogImpl<T> implements ShowDialog<T> {
 
   @override
   String toString() {
-    return 'PixabayEvent<$T>.showDialog(message: $message)';
+    return 'ImageEvent<$T>.showDialog(message: $message)';
   }
 
   @override
@@ -358,7 +358,7 @@ class _$ShowDialogImpl<T> implements ShowDialog<T> {
   }
 }
 
-abstract class ShowDialog<T> implements PixabayEvent<T> {
+abstract class ShowDialog<T> implements ImageEvent<T> {
   const factory ShowDialog(final String message) = _$ShowDialogImpl<T>;
 
   @override
