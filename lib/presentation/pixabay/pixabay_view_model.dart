@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 
@@ -11,12 +13,16 @@ class PixabayViewModel extends ChangeNotifier {
 
   bool isLoading = false;
 
+  final _isLoadingController = StreamController<bool>();
+
+  Stream<bool> get isLoadingStream => _isLoadingController.stream;
+
   Future<void> searchImage(String query) async{
-    isLoading = true;
+    _isLoadingController.add(true);
     notifyListeners();
 
     _pixabayItem = await _reposiotry.getPixabayItem(query);
-    isLoading = false;
+    _isLoadingController.add(false);
     notifyListeners();
   }
 
