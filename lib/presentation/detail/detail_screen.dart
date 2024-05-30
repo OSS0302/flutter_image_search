@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/domain/model/image_item.dart';
+import 'package:image_search_app/domain/model/pixabay_item.dart';
 
 class DetailScreen extends StatelessWidget {
-  final ImageItem imageItem;
+  final PixabayItem pixabayItem;
 
-  const DetailScreen({super.key, required this.imageItem});
+  const DetailScreen({super.key, required this.pixabayItem});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(imageItem.tags),
+        title: Text(pixabayItem.tags),
       ),
       body: Hero(
-        tag: imageItem.id,
+        tag: pixabayItem.id,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
-              imageItem.imageUrl,
+              pixabayItem.imageUrl,
               fit: BoxFit.cover,
               width: 400,
               height: 400,
