@@ -123,7 +123,38 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         itemBuilder: (context, index) {
                           final pixabayItems =
                           state.pixabayItem[index];
-                          return PixabayWidget(pixabayItems: pixabayItems);
+                          return GestureDetector(
+                            onTap: () async{
+                              await showDialog(context: context, builder: (context) {
+                                return AlertDialog(
+                                  title: Text('Pixabay image Search App'),
+                                  content: Text('pixabay image complete data'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.purpleAccent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: TextButton(onPressed: ()  {
+                                        context.push('/detail',extra: pixabayItems);
+                                        context.pop();
+                                      } , child: Text('확인')),
+                                    ),Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.purpleAccent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: TextButton(onPressed: ()  {
+                                        context.pop();
+                                      } , child: Text('취소')),
+                                    )
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value){}
+                              });
+                            },
+                              child: PixabayWidget(pixabayItems: pixabayItems));
                         },
                       ),
                     ),
