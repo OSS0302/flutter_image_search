@@ -63,28 +63,34 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              imageViewModel.isLoading
-                  ? Center(
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          Text('잠시만 기다려주세요'),
-                        ],
-                      ),
-                    )
-                  : Expanded(
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            mainAxisSpacing: 32,
-                            crossAxisSpacing: 32),
-                        itemCount: imageViewModel.imageItem.length,
-                        itemBuilder: (context, index) {
-                          final imageItems = imageViewModel.imageItem[index];
-                          return ImageWidget(imageItems: imageItems);
-                        },
-                      ),
+              StreamBuilder<bool>(
+                initialData: false,
+                  stream: imageViewModel.isLoadingStream, builder: (context, snapshot){
+                if(snapshot.data! == true) {
+                  return Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        Text('잠시만 기다려주세요'),
+                      ],
                     ),
+                  );
+                }
+                return Expanded(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        mainAxisSpacing: 32,
+                        crossAxisSpacing: 32),
+                    itemCount: imageViewModel.imageItem.length,
+                    itemBuilder: (context, index) {
+                      final imageItems = imageViewModel.imageItem[index];
+                      return ImageWidget(imageItems: imageItems);
+                    },
+                  ),
+                );
+              })
+
             ],
           ),
         ),
