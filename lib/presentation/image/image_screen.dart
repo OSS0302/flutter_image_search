@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
 import 'package:provider/provider.dart';
+
+import 'image_event.dart';
 
 
 class ImageScreen extends StatefulWidget {
@@ -13,10 +18,39 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
+  StreamSubscription<ImageEvent>? subscription;
 
+  @override
+  void initState() {
+    Future.microtask(() {
+      context.read<ImageViewModel>().eventStream.listen((event) {
+        switch(event){
+
+          case ShowSnackBar():
+           final snackBar = SnackBar(content: Text(event.message));
+           ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowDialog():
+            showDialog(context: context, builder: (context){
+              return AlertDialog(
+                title: Text('이미지 검색앱'),
+                content: Text('이미지 데이터 가져오기 완료'),
+                actions: [
+                  TextButton(onPressed: () {
+                    context.pop();
+                  }, child: Text('확인'))
+                ],
+              );
+            });
+
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
+    subscription?.cancel();
     imageSearchController.dispose();
     super.dispose();
   }
@@ -39,19 +73,19 @@ class _ImageScreenState extends State<ImageScreen> {
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: Colors.purple,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       color: Colors.purple,
                     ),
                   ),
                   hintText: '이미지 검색 앱',
                   suffixIcon: IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.search_rounded,
                       color: Colors.purple,
                     ),
@@ -64,10 +98,10 @@ class _ImageScreenState extends State<ImageScreen> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
-              state.isLoading ? Center(
+              state.isLoading ? const Center(
                 child: Column(
                   children: [
                     CircularProgressIndicator(),
@@ -77,8 +111,8 @@ class _ImageScreenState extends State<ImageScreen> {
               )
                : Expanded(
                   child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
                         mainAxisSpacing: 32,
                         crossAxisSpacing: 32),
                     itemCount: state.imageItem.length,
