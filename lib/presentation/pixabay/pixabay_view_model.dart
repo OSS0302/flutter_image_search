@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 
 import '../../data/model/pixabay_item.dart';
 import '../../data/repository/pixabay_repository.dart';
