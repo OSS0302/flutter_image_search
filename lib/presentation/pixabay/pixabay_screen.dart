@@ -23,6 +23,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
   @override
   Widget build(BuildContext context) {
     final pixabayViewModel = context.read<PixabayViewModel>();
+    final state = pixabayViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: const Text('이미지 검색 앱'),
@@ -56,14 +57,13 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       onPressed: () async {
                         await pixabayViewModel
                             .fetchImage(textEditingController.text);
-                        setState(() {});
                       },
                     )),
               ),
               SizedBox(
                 height: 24,
               ),
-             pixabayViewModel.isLoading ?  Column(
+             state.isLoading ?  Column(
                children: [
                  CircularProgressIndicator(),
                  Text('잠시만 기다려 주세요'),
@@ -76,10 +76,10 @@ class _PixabayScreenState extends State<PixabayScreen> {
                               crossAxisCount: 4,
                               crossAxisSpacing: 32,
                               mainAxisSpacing: 32),
-                      itemCount: pixabayViewModel.pixabyaItem.length,
+                      itemCount: state.pixabyaItem.length,
                       itemBuilder: (context, index) {
                         final pixabayItems =
-                            pixabayViewModel.pixabyaItem[index];
+                            state.pixabyaItem[index];
                         return PixabayWidget(pixabayItems: pixabayItems);
                       },
                     ),
