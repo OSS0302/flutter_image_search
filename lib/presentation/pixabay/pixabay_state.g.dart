@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'image_state.dart';
+part of 'pixabay_state.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$ImageStateImpl _$$ImageStateImplFromJson(Map<String, dynamic> json) =>
-    _$ImageStateImpl(
-      imageItem: (json['imageItem'] as List<dynamic>?)
-              ?.map((e) => ImageItem.fromJson(e as Map<String, dynamic>))
+_$PixabayStateImpl _$$PixabayStateImplFromJson(Map<String, dynamic> json) =>
+    _$PixabayStateImpl(
+      pixabyaItem: (json['pixabyaItem'] as List<dynamic>?)
+              ?.map((e) => PixabayItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       isLoading: json['isLoading'] as bool? ?? false,
     );
 
-Map<String, dynamic> _$$ImageStateImplToJson(_$ImageStateImpl instance) =>
+Map<String, dynamic> _$$PixabayStateImplToJson(_$PixabayStateImpl instance) =>
     <String, dynamic>{
-      'imageItem': instance.imageItem,
+      'pixabyaItem': instance.pixabyaItem,
       'isLoading': instance.isLoading,
     };
