@@ -63,15 +63,21 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              imageViewModel.isLoading ? Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('데이터 로딩중입니다.'),
-                  ],
-                ),
-              )
-               : Expanded(
+              StreamBuilder<bool>(
+                initialData: false,
+                stream: imageViewModel.isLoadingStream,
+                builder: (context, snapshot) {
+                  if (snapshot.data! == true) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('데이터 로딩중입니다.')
+                        ],
+                      ),
+                    );
+                  }
+                  return Expanded(
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
@@ -83,8 +89,8 @@ class _ImageScreenState extends State<ImageScreen> {
                         return ImageWidget(imageItems: imageItems);
                       },
                     ),
-
-
+                  );
+                },
               ),
             ],
           ),
