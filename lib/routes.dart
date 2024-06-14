@@ -1,4 +1,3 @@
-import 'dart:js';
 
 import 'package:go_router/go_router.dart';
 import 'package:image_search_app/presentation/image/image_screen.dart';
