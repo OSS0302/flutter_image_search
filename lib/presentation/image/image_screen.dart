@@ -125,7 +125,47 @@ class _ImageScreenState extends State<ImageScreen> {
                         itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
                           final imageItems = state.imageItem[index];
-                          return ImageWidget(imageItems: imageItems);
+                          return GestureDetector(
+                              onTap: () async {
+                                await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('image Search App'),
+                                        content: Text('이미지를 자세히 보시겠습니까?'),
+                                        actions: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.amber,
+                                            ),
+                                            child: TextButton(
+                                                onPressed: () {
+                                                  context.push('/detail',extra: imageItems);
+                                                  context.pop();
+                                                },
+                                                child: Text('확인')),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.amber,
+                                            ),
+                                            child: TextButton(
+                                                onPressed: () {
+                                                  context.pop();
+                                                },
+                                                child: Text('취소')),
+                                          )
+                                        ],
+                                      );
+                                    }).then((value) {
+                                      if(value == null && value){}
+                                    });
+                              },
+                              child: ImageWidget(imageItems: imageItems));
                         },
                       ),
                     ),
