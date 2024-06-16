@@ -2,36 +2,37 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:image_search_app/core/result.dart';
+import 'package:image_search_app/domain/use_case/search_use_case.dart';
 import 'package:image_search_app/presentation/image/image_event.dart';
 
-import '../../data/model/image_item.dart';
-import '../../data/repository/image_repository.dart';
+import '../../domain/model/image_item.dart';
+import '../../domain/repository/image_repository.dart';
 import 'image_state.dart';
 
 class ImageViewModel extends ChangeNotifier {
-  final  ImageRepository _repository;
+  final SearchUseCase _searchUseCase;
 
    ImageViewModel({
-    required ImageRepository repository,
-  }) : _repository = repository;
-   
-   ImageState _state =  ImageState(isLoading: false, imageItem: List.unmodifiable([]));
-   
-   ImageState get state => _state;
+    required SearchUseCase searchUseCase,
+  }) : _searchUseCase = searchUseCase;
 
-   final _eventController = StreamController<ImageEvent>();
+  ImageState _state =
+      ImageState(isLoading: false, imageItem: List.unmodifiable([]));
 
-   Stream<ImageEvent> get eventStream => _eventController.stream;
+  ImageState get state => _state;
 
-  Future<void> fetchImage(String query) async{
+  final _eventController = StreamController<ImageEvent>();
+
+  Stream<ImageEvent> get eventStream => _eventController.stream;
+
+  Future<void> fetchImage(String query) async {
     _state = state.copyWith(
       isLoading: true,
     );
     notifyListeners();
 
-    final result  = await _repository.getImageItems(query);
-    switch(result) {
-
+    final result = await _searchUseCase.execute(query);
+    switch (result) {
       case Success<List<ImageItem>>():
         _state = state.copyWith(
           isLoading: false,
@@ -46,6 +47,5 @@ class ImageViewModel extends ChangeNotifier {
         );
         notifyListeners();
     }
-
   }
 }
