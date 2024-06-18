@@ -64,16 +64,21 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              pixabayViewModel.isLoading
-                  ? Center(
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          Text('데이터 로딩중입니다.')
-                        ],
-                      ),
-                    )
-                  : Expanded(
+              StreamBuilder<bool>(
+                initialData: false,
+                  stream: pixabayViewModel.isLoadingStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.data! == true) {
+                      return Center(
+                        child: Column(
+                          children: [
+                            CircularProgressIndicator(),
+                            Text('데이터 로딩중입니다.')
+                          ],
+                        ),
+                      );
+                    }
+                    return Expanded(
                       child: GridView.builder(
                         itemCount: pixabayViewModel.pixabayItem.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -86,7 +91,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                       ),
-                    ),
+                    );
+                  }),
             ],
           ),
         ),
