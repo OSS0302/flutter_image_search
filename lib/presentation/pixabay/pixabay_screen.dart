@@ -51,14 +51,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   hintText: '이미지 검색 하세요',
                   suffixIcon: IconButton(
                     onPressed: () async {
-                     final result =  await pixabayViewModel
+                      await pixabayViewModel
                           .fetchImage(textSearchController.text);
-                     if(result == false) {
-                       const snackBar = SnackBar(content: Text('오류'));
-                       if(mounted) {
-                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                       }
-                     }
                       setState(() {});
                     },
                     icon: Icon(
