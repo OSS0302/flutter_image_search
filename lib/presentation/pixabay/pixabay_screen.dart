@@ -157,6 +157,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                     ),
                                   ],
                                 );
+                              }).then((value) {
+                                if(value != null && value){}
                               });
                             },
                               child: PixabayWidget(pixabayItems: pixabayItems));
