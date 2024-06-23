@@ -14,9 +14,12 @@ class HeroScreen extends StatelessWidget {
       ),
       body: Hero(tag: pixabayItem.id,
       child: 
-      ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Image.network(pixabayItem.imageUrl,fit: BoxFit.cover,width: 400,height: 400, ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.network(pixabayItem.imageUrl,fit: BoxFit.cover,width: 400,height: 400, ),
+        ),
       )),
     );
   }
