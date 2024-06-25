@@ -86,7 +86,7 @@ class _ImageScreenState extends State<ImageScreen> {
                         itemCount: imageItem.length,
                         itemBuilder: (context, index) {
                           final imageItems = imageItem[index];
-                          ImageWidget(imageItems: imageItems);
+                          return ImageWidget(imageItems: imageItems);
                         },
                       ),
                     );
