@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/model/image_item.dart';
-import 'package:image_search_app/data/repository/image_repository_impl.dart';
+import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
 
 class ImageScreen extends StatefulWidget {
@@ -12,6 +11,7 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
+  final imageViewModel = ImageViewModel();
 
   @override
   void dispose() {
@@ -53,7 +53,9 @@ class _ImageScreenState extends State<ImageScreen> {
                       Icons.ads_click_outlined,
                       color: Colors.purpleAccent,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      await imageViewModel
+                          .fetchImage(imageSearchController.text);
                       setState(() {});
                     },
                   ),
@@ -62,11 +64,11 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              FutureBuilder<List<ImageItem>>(
-                  future: ImageRepositoryImpl()
-                      .getImageItems(imageSearchController.text),
+              StreamBuilder<bool>(
+                initialData: false,
+                  stream: imageViewModel.isLoadingStream,
                   builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
+                    if (snapshot.data! == true) {
                       return Center(
                         child: Column(
                           children: [
@@ -76,17 +78,16 @@ class _ImageScreenState extends State<ImageScreen> {
                         ),
                       );
                     }
-                    final imageItem = snapshot.data!;
                     return Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             crossAxisSpacing: 32,
                             mainAxisSpacing: 32),
-                        itemCount: imageItem.length,
+                        itemCount: imageViewModel.imageItem.length,
                         itemBuilder: (context, index) {
-                          final imageItems = imageItem[index];
-                          ImageWidget(imageItems: imageItems);
+                          final imageItems = imageViewModel.imageItem[index];
+                          return ImageWidget(imageItems: imageItems);
                         },
                       ),
                     );
