@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
+import 'package:provider/provider.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -11,7 +12,7 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
-  final imageViewModel = ImageViewModel();
+
 
   @override
   void dispose() {
@@ -21,6 +22,7 @@ class _ImageScreenState extends State<ImageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageViewModel = context.read<ImageViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('image Search App'),
@@ -64,21 +66,16 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              StreamBuilder<bool>(
-                initialData: false,
-                  stream: imageViewModel.isLoadingStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.data! == true) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(),
-                            Text('데이터 로딩중입니다.')
-                          ],
-                        ),
-                      );
-                    }
-                    return Expanded(
+              imageViewModel.isLoading
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('데이터 로딩중입니다.')
+                        ],
+                      ),
+                    )
+                  : Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
@@ -90,8 +87,7 @@ class _ImageScreenState extends State<ImageScreen> {
                           return ImageWidget(imageItems: imageItems);
                         },
                       ),
-                    );
-                  }),
+                    ),
             ],
           ),
         ),
