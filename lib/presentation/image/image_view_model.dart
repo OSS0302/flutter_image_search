@@ -13,25 +13,30 @@ class ImageViewModel extends ChangeNotifier {
     required ImageRepository repository,
   }) : _repository = repository;
 
-   ImageState _state = ImageState(
+  ImageState _state = ImageState(
     imageItem: List.unmodifiable([]),
     isLoading: false,
   );
 
   ImageState get state => _state;
 
-  Future<void> fetchImage(String query) async {
+  Future<bool> fetchImage(String query) async {
     _state = state.copyWith(
       isLoading: true,
     );
     notifyListeners();
 
-    final result = await _repository.getImageItems(query);
+    try {
+      final result = await _repository.getImageItems(query);
 
-    _state = state.copyWith(
-      isLoading: false,
-      imageItem: List.unmodifiable(result),
-    );
-    notifyListeners();
+      _state = state.copyWith(
+        isLoading: false,
+        imageItem: List.unmodifiable(result),
+      );
+      notifyListeners();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
