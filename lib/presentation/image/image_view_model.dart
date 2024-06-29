@@ -1,17 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:image_search_app/core/result.dart';
+import 'package:image_search_app/domain/use_case/search_use_case.dart';
+import 'package:image_search_app/presentation/image/image_event.dart';
 
-import '../../data/model/image_item.dart';
-import '../../data/repository/image_repository.dart';
+import '../../domain/model/image_item.dart';
 import 'image_state.dart';
 
 class ImageViewModel extends ChangeNotifier {
-  final ImageRepository _repository;
+  final SearchUseCase  _searchUseCase;
 
-  ImageViewModel({
-    required ImageRepository repository,
-  }) : _repository = repository;
+   ImageViewModel({
+    required SearchUseCase searchUseCase,
+  }) : _searchUseCase = searchUseCase;
 
   ImageState _state = ImageState(
     imageItem: List.unmodifiable([]),
@@ -20,23 +22,31 @@ class ImageViewModel extends ChangeNotifier {
 
   ImageState get state => _state;
 
-  Future<bool> fetchImage(String query) async {
+  final _eventController = StreamController<ImageEvent>();
+
+  Stream<ImageEvent> get eventStream => _eventController.stream;
+
+  Future<void> fetchImage(String query) async {
     _state = state.copyWith(
       isLoading: true,
     );
     notifyListeners();
 
-    try {
-      final result = await _repository.getImageItems(query);
+    final result = await _searchUseCase.execute(query);
+    switch(result){
 
-      _state = state.copyWith(
-        isLoading: false,
-        imageItem: List.unmodifiable(result),
-      );
-      notifyListeners();
-      return true;
-    } catch (e) {
-      return false;
+      case Success<List<ImageItem>>():
+        _state = state.copyWith(
+          isLoading: false,
+          imageItem: List.unmodifiable(result.data.toList()),
+        );
+        notifyListeners();
+        _eventController.add(const ImageEvent.showSnackBar('성공!'));
+        _eventController.add(const ImageEvent.showDialog('다이얼로그'));
+
+      case Error<List<ImageItem>>():
+        // TODO: Handle this case.
     }
+
   }
 }

@@ -1,58 +1,19 @@
-import '../../data/model/image_item.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
 
-class ImageState {
-  List<ImageItem> imageItem;
+import '../../domain/model/image_item.dart';
 
-  bool isLoading = false;
 
-//<editor-fold desc="Data Methods">
-  ImageState({
-    required this.imageItem,
-    required this.isLoading,
-  });
+part 'image_state.freezed.dart';
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is ImageState &&
-          runtimeType == other.runtimeType &&
-          imageItem == other.imageItem &&
-          isLoading == other.isLoading);
+part 'image_state.g.dart';
 
-  @override
-  int get hashCode => imageItem.hashCode ^ isLoading.hashCode;
+@freezed
+class ImageState with _$ImageState {
+  const factory ImageState({
+    @Default(false) bool isLoading,
+    @Default([]) List<ImageItem> imageItem,
+  }) = _ImageState;
 
-  @override
-  String toString() {
-    return 'ImageState{' +
-        ' imageItem: $imageItem,' +
-        ' isLoading: $isLoading,' +
-        '}';
-  }
-
-  ImageState copyWith({
-    List<ImageItem>? imageItem,
-    bool? isLoading,
-  }) {
-    return ImageState(
-      imageItem: imageItem ?? this.imageItem,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'imageItem': this.imageItem,
-      'isLoading': this.isLoading,
-    };
-  }
-
-  factory ImageState.fromJson(Map<String, dynamic> json) {
-    return ImageState(
-      imageItem: json['imageItem'] as List<ImageItem>,
-      isLoading: json['isLoading'] as bool,
-    );
-  }
-
-//</editor-fold>
+  factory ImageState.fromJson(Map<String, Object?> json) => _$ImageStateFromJson(json);
 }

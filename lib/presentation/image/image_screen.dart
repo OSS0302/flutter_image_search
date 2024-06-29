@@ -1,7 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
 import 'package:provider/provider.dart';
+
+import 'image_event.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -12,11 +17,40 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
+  StreamSubscription<ImageEvent>? subscription;
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      subscription  = context.read<ImageViewModel>().eventStream.listen((event) {
+       switch(event){
+
+         case ShowSnackBar():
+            final snackBar = SnackBar(content: Text(event.message));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         case ShowDialog():
+           showDialog(context: context, builder: (context){
+             return  AlertDialog(
+               title: Text('image Search App'),
+               content: Text('image data complete'),
+               actions: [
+                 TextButton(onPressed: () {
+                   context.pop();
+             }, child: Text('확인'))
+               ],
+             );
+           });
+       }
+      });
+    });
+    super.initState();
+  }
 
 
   @override
   void dispose() {
     imageSearchController.dispose();
+    subscription?.cancel();
     super.dispose();
   }
 
@@ -57,14 +91,9 @@ class _ImageScreenState extends State<ImageScreen> {
                       color: Colors.purpleAccent,
                     ),
                     onPressed: () async {
-                    final result =  await imageViewModel
+                      await imageViewModel
                           .fetchImage(imageSearchController.text);
-                    if(result == false) {
-                      const snackBar = SnackBar(content: Text('오류'));
-                      if(mounted){
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    }
+
                       setState(() {});
                     },
                   ),
