@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixabay_widget.dart';
+import 'package:provider/provider.dart';
 
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
@@ -12,7 +12,7 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final pixabaySearchController = TextEditingController();
-  final pixabayViewModel = PixabayViewModel();
+
 
   @override
   void dispose() {
@@ -22,6 +22,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pixabayViewModel = context.read<PixabayViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('이미지 검색앱'),
@@ -65,21 +66,16 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              StreamBuilder<bool>(
-                initialData: false,
-                  stream: pixabayViewModel.isLoadingStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.data! == true) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(),
-                            Text('잠시만 기달려 주세요'),
-                          ],
-                        ),
-                      );
-                    }
-                    return Expanded(
+              pixabayViewModel.isLoading
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('잠시만 기달려 주세요'),
+                        ],
+                      ),
+                    )
+                  : Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
@@ -92,8 +88,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                       ),
-                    );
-                  }),
+                    ),
             ],
           ),
         ),
