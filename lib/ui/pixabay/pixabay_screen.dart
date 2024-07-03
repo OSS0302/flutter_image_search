@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
@@ -59,8 +58,14 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.tealAccent,
                     ),
                     onPressed: () async {
-                      await pixabayViewModel
+                     final result =  await pixabayViewModel
                           .fetchImage(pixabaySearchController.text);
+                     if(result == false) {
+                       const snackBar = SnackBar(content: Text('네트워크 오류'));
+                       if(mounted) {
+                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                       }
+                     }
                       setState(() {});
                     },
                   ),
