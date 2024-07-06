@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/image_repository_impl.dart';
 import 'package:image_search_app/presentation/image/image_view_model.dart';
 import 'package:image_search_app/presentation/widget/image_widget.dart';
 
@@ -54,8 +53,9 @@ class _ImageScreenState extends State<ImageScreen> {
                       Icons.search_rounded,
                       color: Colors.redAccent,
                     ),
-                    onPressed: () async{
-                      await imageViewModel.fetchImage(imageSearchController.text);
+                    onPressed: () async {
+                      await imageViewModel
+                          .fetchImage(imageSearchController.text);
                       setState(() {});
                     },
                   ),
@@ -64,17 +64,20 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              imageViewModel.isLoading ? Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('(잠시만 기달려주세요)')
-                  ],
-                ),
-              )
-               : Expanded(
+              StreamBuilder<bool>(
+                initialData: false,
+                  stream: imageViewModel.isLoadingStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.data! == null) {
+                      return Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('(잠시만 기달려주세요)')
+                        ],
+                      );
+                    }
+                    return Expanded(
                       child: GridView.builder(
-
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             mainAxisSpacing: 32,
@@ -85,8 +88,8 @@ class _ImageScreenState extends State<ImageScreen> {
                           return ImageWidget(imageItems: imageItems);
                         },
                       ),
-
-                  ),
+                    );
+                  }),
             ],
           ),
         ),
