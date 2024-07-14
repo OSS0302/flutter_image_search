@@ -1,4 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/presentation/widget/pixabay_widget.dart';
 import 'package:provider/provider.dart';
@@ -12,10 +16,48 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final pixabaySearchController = TextEditingController();
+  StreamSubscription<PixabayEvent>? subscription;
 
+  @override
+  void initState() {
+    Future.microtask(() {
+      subscription =
+          context.read<PixabayViewModel>().eventStream.listen((event) {
+        switch (event) {
+          case ShowDialog():
+            final snackBar = SnackBar(content: Text(event.message));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowSnackBar():
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('pixabay Image App'),
+                    content: Text('이미지 가져오기 완료'),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.blueAccent,
+                        ),
+                        child: TextButton(
+                            onPressed: () {
+                              context.pop();
+                            },
+                            child: Text('확인')),
+                      ),
+                    ],
+                  );
+                });
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
+    subscription?.cancel();
     pixabaySearchController.dispose();
     super.dispose();
   }
@@ -57,9 +99,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.blueAccent,
                     ),
                     onPressed: () async {
-                       await pixabayViewModel
+                      await pixabayViewModel
                           .searchImage(pixabaySearchController.text);
-
 
                       setState(() {});
                     },
@@ -86,9 +127,44 @@ class _PixabayScreenState extends State<PixabayScreen> {
                             mainAxisSpacing: 32),
                         itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
-                          final pixabayItems =
-                              state.pixabayItem[index];
-                          return PixabayWidget(pixabayItems: pixabayItems);
+                          final pixabayItems = state.pixabayItem[index];
+                          return GestureDetector(
+                            onTap: () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('pixabay Image App'),
+                                  content: Text('이미지 가져오기 완료'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.blueAccent,
+                                      ),
+                                      child: TextButton(
+                                          onPressed: () {
+                                            context.push('/hero',extra: pixabayItems);
+                                            context.pop();
+                                          },
+                                          child: Text('확인')),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.blueAccent,
+                                      ),
+                                      child: TextButton(
+                                          onPressed: () {
+                                            context.pop();
+                                          },
+                                          child: Text('취소')),
+                                    ),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value) {}
+                              });
+                            },
+                              child: PixabayWidget(pixabayItems: pixabayItems));
                         },
                       ),
                     ),
