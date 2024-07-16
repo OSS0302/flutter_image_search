@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_search_app/data/repository/Image_repository_impl.dart';
+import 'package:image_search_app/ui/image/image_view_model.dart';
 import 'package:image_search_app/ui/widget/image_widget.dart';
+import 'package:provider/provider.dart';
 
 import '../../data/model/image_item.dart';
 
@@ -14,6 +16,7 @@ class ImageScreen extends StatefulWidget {
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
 
+
   @override
   void dispose() {
     imageSearchController.text;
@@ -22,6 +25,7 @@ class _ImageScreenState extends State<ImageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageViewModel = context.read<ImageViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: Text('image Search App'),
@@ -54,7 +58,9 @@ class _ImageScreenState extends State<ImageScreen> {
                       Icons.search_rounded,
                       color: Colors.blue,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      await imageViewModel
+                          .fetchImage(imageSearchController.text);
                       setState(() {});
                     },
                   ),
@@ -63,36 +69,30 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              FutureBuilder<List<ImageItem>>(
-                  future: ImageRepositoryImpl()
-                      .getImageItems(imageSearchController.text),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(),
-                            Text('잠시만 기다려 주세요'),
-                            Text('로딩 중 입니다.'),
-                          ],
+              imageViewModel.isLoading
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('잠시만 기다려 주세요'),
+                          Text('로딩 중 입니다.'),
+                        ],
+                      ),
+                    )
+                  : Expanded(
+                      child: GridView.builder(
+                        itemCount: imageViewModel.imageItem.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          mainAxisSpacing: 32,
+                          crossAxisSpacing: 32,
                         ),
-                      );
-                    }
-                    final imageItem = snapshot.data!;
-                    return Expanded(
-                        child: GridView.builder(
-                          itemCount: imageItem.length,
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 4,
-                                    mainAxisSpacing: 32,
-                                    crossAxisSpacing: 32,
-                                    ),
-                            itemBuilder: (context, index) {
-                              final imageItems = imageItem[index];
-                              return ImageWidget(imageItems: imageItems);
-                            }));
-                  })
+                        itemBuilder: (context, index) {
+                          final imageItems = imageViewModel.imageItem[index];
+                          return ImageWidget(imageItems: imageItems);
+                        },
+                      ),
+                    )
             ],
           ),
         ),
