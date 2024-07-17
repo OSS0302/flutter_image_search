@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/Image_repository_impl.dart';
 import 'package:image_search_app/ui/image/image_view_model.dart';
 import 'package:image_search_app/ui/widget/image_widget.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +25,7 @@ class _ImageScreenState extends State<ImageScreen> {
   @override
   Widget build(BuildContext context) {
     final imageViewModel = context.read<ImageViewModel>();
+    final state = imageViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: Text('image Search App'),
@@ -59,8 +59,14 @@ class _ImageScreenState extends State<ImageScreen> {
                       color: Colors.blue,
                     ),
                     onPressed: () async {
-                      await imageViewModel
+                     final result =  await imageViewModel
                           .fetchImage(imageSearchController.text);
+                     if(result == false) {
+                       const  snackBar = SnackBar(content: Text('네트워크 오류'));
+                       if(mounted){
+                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                       }
+                     }
                       setState(() {});
                     },
                   ),
@@ -69,7 +75,7 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              imageViewModel.isLoading
+              state.isLoading
                   ? Center(
                       child: Column(
                         children: [
@@ -81,14 +87,14 @@ class _ImageScreenState extends State<ImageScreen> {
                     )
                   : Expanded(
                       child: GridView.builder(
-                        itemCount: imageViewModel.imageItem.length,
+                        itemCount: state.imageItem.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 4,
                           mainAxisSpacing: 32,
                           crossAxisSpacing: 32,
                         ),
                         itemBuilder: (context, index) {
-                          final imageItems = imageViewModel.imageItem[index];
+                          final imageItems = state.imageItem[index];
                           return ImageWidget(imageItems: imageItems);
                         },
                       ),
