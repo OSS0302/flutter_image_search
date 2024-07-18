@@ -1,14 +1,9 @@
-sealed class Result<T> {
-  factory Result.success(T data) = Success;
-  factory Result.error(Exception e) = Error;
-}
-class Success<T> implements Result<T> {
-  final T data;
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  Success(this.data);
-}
-class Error<T> implements Result<T> {
-  Exception e;
+part 'result.freezed.dart';
 
-  Error(this.e);
+@freezed
+sealed class Result<T> with _$Result<T> {
+  const factory Result.success(T data) = Success;
+  const factory Result.error(Exception e) = Error;
 }
