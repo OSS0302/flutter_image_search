@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_search_app/ui/image/image_view_model.dart';
-import 'package:image_search_app/ui/widget/image_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/model/image_item.dart';
+import '../widget/image_widget.dart';
 import 'image_event.dart';
+import 'image_view_model.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
