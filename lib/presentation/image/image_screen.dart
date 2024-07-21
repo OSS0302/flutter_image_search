@@ -112,8 +112,7 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              state.isLoading
-                  ? Center(
+              if (state.isLoading) Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
@@ -121,8 +120,7 @@ class _ImageScreenState extends State<ImageScreen> {
                           Text('로딩 중 입니다.'),
                         ],
                       ),
-                    )
-                  : Expanded(
+                    ) else Expanded(
                       child: GridView.builder(
                         itemCount: state.imageItem.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -132,7 +130,44 @@ class _ImageScreenState extends State<ImageScreen> {
                         ),
                         itemBuilder: (context, index) {
                           final imageItems = state.imageItem[index];
-                          return ImageWidget(imageItems: imageItems);
+                          return GestureDetector(
+                            onTap: () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('image Search App'),
+                                  content: Text('이미지 가져오기 완료'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.blueAccent,
+
+                                      ),
+                                      child: TextButton(
+                                          onPressed: () {
+                                            context.push('/hero', extra: imageItems);
+                                            context.pop();
+                                          },
+                                          child: Text('확인')),
+                                    ),Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.blueAccent,
+
+                                      ),
+                                      child: TextButton(
+                                          onPressed: () {
+                                            context.pop();
+                                          },
+                                          child: Text('취소')),
+                                    ),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value) {}
+                              });
+                            },
+                              child: ImageWidget(imageItems: imageItems));
                         },
                       ),
                     )
