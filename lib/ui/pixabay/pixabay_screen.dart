@@ -65,30 +65,36 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              pixabayViewModel.isLoading
-                  ? Center(
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          Text('잠시만 기다려 주세요'),
-                          Text('로딩 중 입니다.'),
-                        ],
-                      ),
-                    )
-                  : Expanded(
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 32,
-                            crossAxisSpacing: 32),
-                        itemCount: pixabayViewModel.pixabayItem.length,
-                        itemBuilder: (context, index) {
-                          final pixabayItems =
-                              pixabayViewModel.pixabayItem[index];
-                          return PixabayWidget(pixabayItems: pixabayItems);
-                        },
-                      ),
+              StreamBuilder(
+                initialData: false,
+                  stream: pixabayViewModel.isLoadingStream, builder: (context,snapshot){
+                if(!snapshot.hasData) {
+                  return Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        Text('잠시만 기다려 주세요'),
+                        Text('로딩 중 입니다.'),
+                      ],
                     ),
+                  );
+                }
+                return Expanded(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 32,
+                        crossAxisSpacing: 32),
+                    itemCount: pixabayViewModel.pixabayItem.length,
+                    itemBuilder: (context, index) {
+                      final pixabayItems =
+                      pixabayViewModel.pixabayItem[index];
+                      return PixabayWidget(pixabayItems: pixabayItems);
+                    },
+                  ),
+                );
+              }),
+
             ],
           ),
         ),
