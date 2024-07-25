@@ -58,8 +58,14 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.indigo,
                     ),
                     onPressed: () async {
-                      await pixabayViewModel
+                     final result = await pixabayViewModel
                           .fetchImage(pixabaySearchController.text);
+                     if(result == false) {
+                       const snackBar = SnackBar(content: Text(('오류')));
+                       if(mounted) {
+                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                       }
+                     }
                       setState(() {});
                     },
                   ),
