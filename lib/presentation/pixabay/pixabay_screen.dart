@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
-import 'package:image_search_app/ui/widget/pixabay_widget.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
+
 import 'package:provider/provider.dart';
+
+import '../widget/pixabay_widget.dart';
 
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
