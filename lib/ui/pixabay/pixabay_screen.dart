@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
+import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixabay_widget.dart';
 import 'package:provider/provider.dart';
@@ -13,10 +17,48 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final pixabaySearchController = TextEditingController();
+  StreamSubscription<PixabayEvent>? subscription;
 
+  @override
+  void initState() {
+    Future.microtask(() {
+      subscription =
+          context.read<PixabayViewModel>().eventStream.listen((event) {
+        switch (event) {
+          case ShowSnackBar():
+            final snackBar = SnackBar(content: Text(event.message));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowDialog():
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('pixabay Search App'),
+                    content: Text('pixabay data complete'),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.indigo
+                        ),
+                        child: TextButton(
+                            onPressed: () {
+                              context.pop();
+                            },
+                            child: Text('확인',style: TextStyle(color: Colors.black),)),
+                      ),
+                    ],
+                  );
+                });
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
+    subscription?.cancel();
     pixabaySearchController.dispose();
     super.dispose();
   }
@@ -58,14 +100,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.indigo,
                     ),
                     onPressed: () async {
-                     final result = await pixabayViewModel
+                      await pixabayViewModel
                           .fetchImage(pixabaySearchController.text);
-                     if(result == false) {
-                       const snackBar = SnackBar(content: Text(('오류')));
-                       if(mounted) {
-                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                       }
-                     }
+
                       setState(() {});
                     },
                   ),
@@ -92,8 +129,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                             crossAxisSpacing: 32),
                         itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
-                          final pixabayItems =
-                              state.pixabayItem[index];
+                          final pixabayItems = state.pixabayItem[index];
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                       ),

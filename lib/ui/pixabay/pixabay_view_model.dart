@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:image_search_app/core/result.dart';
+import 'package:image_search_app/data/model/pixabay_item.dart';
+import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_state.dart';
 
 import '../../data/repository/pixabay_repository.dart';
@@ -15,26 +20,34 @@ class PixabayViewModel extends ChangeNotifier {
 
   PixabayState get state => _state;
 
+  final _eventController = StreamController<PixabayEvent>();
+  Stream<PixabayEvent> get eventStream => _eventController.stream;
 
-
-  Future<bool> fetchImage(String query) async{
+  Future<void> fetchImage(String query) async{
     _state = state.copyWith(
       isLoading: true,
     );
     notifyListeners();
 
-    try {
-      final  result = await _repository.getPixabayItem(query);
+    final  result = await _repository.getPixabayItem(query);
+    switch(result) {
 
-      _state = state.copyWith(
-        isLoading: false,
-        pixabayItem: List.unmodifiable(result),
-      );
-      notifyListeners();
-      return true;
-    }catch(e) {
-      return false;
+      case Success<List<PixabayItem>>():
+        _state = state.copyWith(
+          isLoading: false,
+          pixabayItem: List.unmodifiable(result.data.toList()),
+        );
+        notifyListeners();
+        _eventController.add(PixabayEvent.showSnackBar('성공'));
+        _eventController.add(PixabayEvent.showDialog('다이얼로그'));
+
+      case Error<List<PixabayItem>>():
+        _state = state.copyWith(
+          isLoading: false,
+        );
+        notifyListeners();
     }
+
   }
 
 }
