@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 
@@ -40,14 +39,16 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     actions: [
                       Container(
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.indigo
-                        ),
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.indigo),
                         child: TextButton(
                             onPressed: () {
                               context.pop();
                             },
-                            child: Text('확인',style: TextStyle(color: Colors.black),)),
+                            child: Text(
+                              '확인',
+                              style: TextStyle(color: Colors.black),
+                            )),
                       ),
                     ],
                   );
@@ -113,29 +114,77 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              state.isLoading
-                  ? Center(
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          Text('잠시만 기다려 주세요'),
-                          Text('로딩 중 입니다.'),
-                        ],
-                      ),
-                    )
-                  : Expanded(
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 32,
-                            crossAxisSpacing: 32),
-                        itemCount: state.pixabayItem.length,
-                        itemBuilder: (context, index) {
-                          final pixabayItems = state.pixabayItem[index];
-                          return PixabayWidget(pixabayItems: pixabayItems);
-                        },
-                      ),
-                    ),
+              if (state.isLoading)
+                Center(
+                  child: Column(
+                    children: [
+                      CircularProgressIndicator(),
+                      Text('잠시만 기다려 주세요'),
+                      Text('로딩 중 입니다.'),
+                    ],
+                  ),
+                )
+              else
+                Expanded(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 32,
+                        crossAxisSpacing: 32),
+                    itemCount: state.pixabayItem.length,
+                    itemBuilder: (context, index) {
+                      final pixabayItems = state.pixabayItem[index];
+                      return GestureDetector(
+                          onTap: () async {
+                            await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('pixabay Search App'),
+                                    content: Text('pixabay data complete'),
+                                    actions: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Colors.indigo),
+                                        child: TextButton(
+                                            onPressed: () {
+                                              context.push('/hero',
+                                                  extra: pixabayItems);
+                                              context.pop();
+                                            },
+                                            child: Text(
+                                              '확인',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            )),
+                                      ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            color: Colors.indigo),
+                                        child: TextButton(
+                                            onPressed: () {
+                                              context.pop();
+                                            },
+                                            child: Text(
+                                              '취소',
+                                              style: TextStyle(
+                                                  color: Colors.black),
+                                            )),
+                                      ),
+                                    ],
+                                  );
+                                }).then((value) {
+                              if (value != null && value) {}
+                            });
+                          },
+                          child: PixabayWidget(pixabayItems: pixabayItems));
+                    },
+                  ),
+                ),
             ],
           ),
         ),
