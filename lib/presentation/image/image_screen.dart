@@ -23,30 +23,31 @@ class _ImageScreenState extends State<ImageScreen> {
   void initState() {
     Future.microtask(() {
       subscription = context.read<ImageViewModel>().eventStream.listen((event) {
-        switch(event) {
-
+        switch (event) {
           case ShowSnackBar():
             final snackBar = SnackBar(content: Text(event.message));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           case ShowDialog():
-           showDialog(context: context, builder: (context){
-             return AlertDialog(
-               title: Text('image Search App'),
-               content: Text('이미지 가져오기 성공'),
-               actions: [
-                 Container(
-                   decoration: BoxDecoration(
-                     color: Colors.indigoAccent,
-                     borderRadius: BorderRadius.circular(20)
-
-                   ),
-                   child: TextButton(onPressed: () {
-                     context.pop();
-                   }, child: Text('확인')),
-                 ),
-               ],
-             );
-           });
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('image Search App'),
+                    content: Text('이미지 가져오기 성공'),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.indigoAccent,
+                            borderRadius: BorderRadius.circular(20)),
+                        child: TextButton(
+                            onPressed: () {
+                              context.pop();
+                            },
+                            child: Text('확인',style: TextStyle(color: Colors.black),)),
+                      ),
+                    ],
+                  );
+                });
         }
       });
     });
@@ -97,29 +98,27 @@ class _ImageScreenState extends State<ImageScreen> {
                         color: Colors.indigoAccent,
                       ),
                       onPressed: () async {
-                         await imageViewModel.fetchImage(imageSearchController.text);
+                        await imageViewModel
+                            .fetchImage(imageSearchController.text);
 
-
-                        setState(() {
-
-                          });
-
+                        setState(() {});
                       },
                     )),
               ),
               SizedBox(
                 height: 24,
               ),
-              state.isLoading ? Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('잠시만 기다려 주세요 '),
-                    Text('로딩 중 입니다.'),
-                  ],
-                ),
-              )
-              : Expanded(
+              state.isLoading
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('잠시만 기다려 주세요 '),
+                          Text('로딩 중 입니다.'),
+                        ],
+                      ),
+                    )
+                  : Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
@@ -131,7 +130,7 @@ class _ImageScreenState extends State<ImageScreen> {
                           return ImageWidget(imageItems: imageItems);
                         },
                       ),
-                  ),
+                    ),
             ],
           ),
         ),
