@@ -57,13 +57,9 @@ class _ImageScreenState extends State<ImageScreen> {
                         color: Colors.indigoAccent,
                       ),
                       onPressed: () async {
-                       final result =  await imageViewModel.fetchImage(imageSearchController.text);
-                       if(result == false) {
-                         const snackBar = SnackBar(content: Text('인터넷을 확인 해 주세요'));
-                         if(mounted){
-                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                         }
-                       }
+                         await imageViewModel.fetchImage(imageSearchController.text);
+
+
                         setState(() {
 
                           });

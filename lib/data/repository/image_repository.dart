@@ -1,5 +1,6 @@
+import '../../core/result.dart';
 import '../model/image_item.dart';
 
 abstract interface class ImageRepository {
-  Future<List<ImageItem>> getImageItems(String query);
+  Future<Result<List<ImageItem>>> getImageItems(String query);
 }
