@@ -67,29 +67,35 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              pixbayViewModel.isLoading
-                  ? Center(
-                      child: Column(
-                        children: [
-                          CircularProgressIndicator(),
-                          Text('로딩 중 입니다. 잠시만 기다려 주세요'),
-                        ],
-                      ),
-                    )
-                  : Expanded(
-                      child: GridView.builder(
-                        itemCount: pixbayViewModel.pixabayItem.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 32,
-                            mainAxisSpacing: 32),
-                        itemBuilder: (context, index) {
-                          final pixbayItems =
-                              pixbayViewModel.pixabayItem[index];
-                          return PixbayWidget(pixabayItems: pixbayItems);
-                        },
-                      ),
+              StreamBuilder(
+                initialData: false,
+                  stream: pixbayViewModel.isLoadingStream, builder: (context, snapshot){
+                if(snapshot.data! == true) {
+                  return  Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(),
+                        Text('로딩 중 입니다. 잠시만 기다려 주세요'),
+                      ],
                     ),
+                  );
+                }
+                return Expanded(
+                  child: GridView.builder(
+                    itemCount: pixbayViewModel.pixabayItem.length,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 32,
+                        mainAxisSpacing: 32),
+                    itemBuilder: (context, index) {
+                      final pixbayItems =
+                      pixbayViewModel.pixabayItem[index];
+                      return PixbayWidget(pixabayItems: pixbayItems);
+                    },
+                  ),
+                );
+              })
+
             ],
           ),
         ),
