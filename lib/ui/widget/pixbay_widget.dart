@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:image_search_app/data/model/pixabay_item.dart';
 
-import '../../domain/model/image_item.dart';
+class PixbayWidget extends StatelessWidget {
+  final PixabayItem pixabayItems;
 
-
-class ImageWidget extends StatelessWidget {
-  final ImageItem imageItems;
-
-  const ImageWidget({super.key, required this.imageItems});
+  const PixbayWidget({super.key, required this.pixabayItems});
 
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Image.network(
-        imageItems.imageUrl,
+        pixabayItems.imageUrl,
         fit: BoxFit.cover,
       ),
     );
