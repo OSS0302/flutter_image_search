@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:image_search_app/core/result.dart';
 import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_state.dart';
 
@@ -27,12 +28,21 @@ class PixabayViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final result  = await _repository.getPixabayItems(query);
+      switch(result) {
 
-      _state = state.copyWith(
-        isLoading: false,
-        pixabayItem: result,
-      );
-      notifyListeners();
+        case Success<List<PixabayItem>>():
+          _state = state.copyWith(
+            isLoading: false,
+            pixabayItem: result.data.toList(),
+          );
+          notifyListeners();
+        case Error<List<PixabayItem>>():
+          _state = state.copyWith(
+            isLoading: false,
+          );
+          notifyListeners();
+      }
+
       return true;
     }catch(e) {
       return false;
