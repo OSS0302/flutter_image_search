@@ -1,8 +1,5 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/model/pixabay_item.dart';
-import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixbay_widget.dart';
 import 'package:provider/provider.dart';
@@ -61,8 +58,12 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         color: Colors.redAccent,
                       ),
                       onPressed: () async {
-                        await pixbayViewModel
+                       final result =  await pixbayViewModel
                             .fetchImage(pixabaySearchController.text);
+                       if(result == false) {
+                         const snackBar = SnackBar(content: Text('오류'));
+                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                       }
                         setState(() {});
                       },
                     )),
