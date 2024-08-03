@@ -1,11 +1,12 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/model/pixabay_item.dart';
-import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
-import 'package:image_search_app/ui/widget/pixbay_widget.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_search_app/preseantation/pixabay/pixabay_event.dart';
+import 'package:image_search_app/preseantation/pixabay/pixabay_view_model.dart';
 import 'package:provider/provider.dart';
+
+import '../widget/pixbay_widget.dart';
 
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
@@ -16,7 +17,45 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final pixabaySearchController = TextEditingController();
+  StreamSubscription<PixabayEvent>? subscription;
 
+  @override
+  void initState() {
+    Future.microtask(() {
+      subscription =
+          context.read<PixabayViewModel>().eventStream.listen((event) {
+        switch (event) {
+          case ShowSnackBar():
+            final snackBar = SnackBar(content: Text(event.message));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowDialog():
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('pixabay Search App'),
+                    content: Text('이미지 데이터 가져오기 완료'),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.redAccent,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            context.pop();
+                          },
+                          child: Text('확인',style: TextStyle(color: Colors.black),),
+                        ),
+                      ),
+                    ],
+                  );
+                });
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -27,6 +66,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
   @override
   Widget build(BuildContext context) {
     final pixbayViewModel = context.read<PixabayViewModel>();
+    final state = pixbayViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: const Text('pixabay Search App'),
@@ -60,8 +100,12 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         color: Colors.redAccent,
                       ),
                       onPressed: () async {
-                        await pixbayViewModel
+                        final result = await pixbayViewModel
                             .fetchImage(pixabaySearchController.text);
+                        if (result == false) {
+                          const snackBar = SnackBar(content: Text('오류'));
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
                         setState(() {});
                       },
                     )),
@@ -69,7 +113,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              pixbayViewModel.isLoading
+              pixbayViewModel.state.isLoading
                   ? Center(
                       child: Column(
                         children: [
@@ -80,14 +124,14 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     )
                   : Expanded(
                       child: GridView.builder(
-                        itemCount: pixbayViewModel.pixabayItem.length,
+                        itemCount: pixbayViewModel.state.pixabayItem.length,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             crossAxisSpacing: 32,
                             mainAxisSpacing: 32),
                         itemBuilder: (context, index) {
                           final pixbayItems =
-                              pixbayViewModel.pixabayItem[index];
+                              pixbayViewModel.state.pixabayItem[index];
                           return PixbayWidget(pixabayItems: pixbayItems);
                         },
                       ),
