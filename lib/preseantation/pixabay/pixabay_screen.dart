@@ -45,7 +45,10 @@ class _PixabayScreenState extends State<PixabayScreen> {
                           onPressed: () {
                             context.pop();
                           },
-                          child: Text('확인',style: TextStyle(color: Colors.black),),
+                          child: Text(
+                            '확인',
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
                       ),
                     ],
@@ -132,7 +135,36 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         itemBuilder: (context, index) {
                           final pixbayItems =
                               pixbayViewModel.state.pixabayItem[index];
-                          return PixbayWidget(pixabayItems: pixbayItems);
+                          return GestureDetector(
+                            onTap: () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: Text('pixabay Search App'),
+                                  content: Text('이미지 데이터 가져오기 완료'),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.push('/hero',extra:pixbayItems);
+                                          context.pop();
+                                        },
+                                        child: Text(
+                                          '확인',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value){}
+                              });
+                            },
+                              child: PixbayWidget(pixabayItems: pixbayItems));
                         },
                       ),
                     ),
