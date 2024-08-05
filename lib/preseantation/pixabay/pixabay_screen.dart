@@ -33,8 +33,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text('pixabay Search App'),
-                    content: Text('이미지 데이터 가져오기 완료'),
+                    elevation: 24,
+                    title: const Text('pixabay Search App'),
+                    content: const Text('이미지 데이터 가져오기 완료'),
                     actions: [
                       Container(
                         decoration: BoxDecoration(
@@ -45,7 +46,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                           onPressed: () {
                             context.pop();
                           },
-                          child: Text(
+                          child: const Text(
                             '확인',
                             style: TextStyle(color: Colors.black),
                           ),
@@ -84,21 +85,21 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 decoration: InputDecoration(
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2,
                         color: Colors.redAccent,
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide(
+                      borderSide: const BorderSide(
                         width: 2,
                         color: Colors.redAccent,
                       ),
                     ),
                     labelText: '이미지를 검색 하세요',
                     suffixIcon: IconButton(
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.search_rounded,
                         color: Colors.redAccent,
                       ),
@@ -113,11 +114,11 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       },
                     )),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
               pixbayViewModel.state.isLoading
-                  ? Center(
+                  ? const Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
@@ -128,7 +129,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   : Expanded(
                       child: GridView.builder(
                         itemCount: pixbayViewModel.state.pixabayItem.length,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             crossAxisSpacing: 32,
                             mainAxisSpacing: 32),
@@ -139,8 +140,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                             onTap: () async{
                               await showDialog(context: context, builder: (context){
                                 return AlertDialog(
-                                  title: Text('pixabay Search App'),
-                                  content: Text('이미지 데이터 가져오기 완료'),
+                                  title: const Text('pixabay Search App'),
+                                  content: const Text('이미지 데이터 가져오기 완료'),
                                   actions: [
                                     Container(
                                       decoration: BoxDecoration(
@@ -152,8 +153,22 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                           context.push('/hero',extra:pixbayItems);
                                           context.pop();
                                         },
-                                        child: Text(
+                                        child: const Text(
                                           '확인',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ),Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: const Text(
+                                          '취소',
                                           style: TextStyle(color: Colors.black),
                                         ),
                                       ),
