@@ -51,20 +51,6 @@ class _PixabayScreenState extends State<PixabayScreen> {
                             style: TextStyle(color: Colors.black),
                           ),
                         ),
-                      ),Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.redAccent,
-                        ),
-                        child: TextButton(
-                          onPressed: () {
-                            context.pop();
-                          },
-                          child: const Text(
-                            '확인',
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
                       ),
                     ],
                   );
