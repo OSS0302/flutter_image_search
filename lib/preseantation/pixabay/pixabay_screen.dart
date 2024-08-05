@@ -33,10 +33,25 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
+                    elevation: 24,
                     title: const Text('pixabay Search App'),
                     content: const Text('이미지 데이터 가져오기 완료'),
                     actions: [
                       Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.redAccent,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            context.pop();
+                          },
+                          child: const Text(
+                            '확인',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      ),Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           color: Colors.redAccent,
@@ -154,6 +169,20 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                         },
                                         child: const Text(
                                           '확인',
+                                          style: TextStyle(color: Colors.black),
+                                        ),
+                                      ),
+                                    ),Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        color: Colors.redAccent,
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: const Text(
+                                          '취소',
                                           style: TextStyle(color: Colors.black),
                                         ),
                                       ),
