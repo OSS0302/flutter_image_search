@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/di/di_setup.dart';
-import 'package:image_search_app/routes.dart';
 
 
 
 void main() {
-  diSetUp();
   runApp(const MyApp());
 }
 
@@ -15,8 +12,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: router,
+    return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
