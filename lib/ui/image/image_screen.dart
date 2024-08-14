@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_search_app/ui/image/image_view_model.dart';
 import 'package:image_search_app/ui/widget/image_widget.dart';
 import 'package:provider/provider.dart';
 
+import 'image_event.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -13,7 +17,41 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchController = TextEditingController();
+  StreamSubscription<ImageEvent>? subscription;
 
+  @override
+  void initState() {
+    Future.microtask(() {
+      subscription = context.read<ImageViewModel>().eventStream.listen((event) {
+        switch (event) {
+          case ShowSnackBar():
+            final snackBar = SnackBar(content: Text(event.message));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowDialog():
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('이미지 검색 앱'),
+                    content: const Text('데이터 가져오기 완료'),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.red,
+                        ),
+                          child:
+                              TextButton(onPressed: () {
+                                context.pop();
+                              }, child: const Text('확인'))),
+                    ],
+                  );
+                });
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -39,52 +77,53 @@ class _ImageScreenState extends State<ImageScreen> {
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       width: 2,
                       color: Colors.red,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       width: 2,
                       color: Colors.red,
                     ),
                   ),
-                  helperText: '이미지 검색 하세요',
+                  hintText: '이미지 검색 하세요',
                   suffixIcon: IconButton(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.search,
                       color: Colors.red,
                     ),
-                    onPressed: () async{
-                     final result =  await imageViewModel.fetchImage(imageSearchController.text);
-                     if(result == false) {
-                       const snackBar =SnackBar(content: Text('오류'));
-                       if(mounted){
-                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                       }
-                     }
+                    onPressed: () async {
+                      final result = await imageViewModel
+                          .fetchImage(imageSearchController.text);
+                      if (result == false) {
+                        const snackBar = SnackBar(content: Text('오류'));
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
                       setState(() {});
                     },
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
-              state.isLoading ?
-              Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    Text('데이터 로딩 중입니다. 잠시만 기다려 주세요'),
-                  ],
-                ),
-              ):
-               Expanded(
+              state.isLoading
+                  ? const Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('데이터 로딩 중입니다. 잠시만 기다려 주세요'),
+                        ],
+                      ),
+                    )
+                  : Expanded(
                       child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             crossAxisSpacing: 32,
                             mainAxisSpacing: 32),
@@ -94,8 +133,7 @@ class _ImageScreenState extends State<ImageScreen> {
                           return ImageWidget(imageItems: imageItems);
                         },
                       ),
-
-                  ),
+                    ),
             ],
           ),
         ),

@@ -9,7 +9,7 @@ class ImageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
-      child: Image.network(imageItems.imageUrl),
+      child: Image.network(imageItems.imageUrl,fit: BoxFit.cover,),
     );
   }
 }
