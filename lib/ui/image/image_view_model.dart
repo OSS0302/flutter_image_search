@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:image_search_app/core/result.dart';
 
 import '../../data/model/image_item.dart';
 import '../../data/repository/image_repository.dart';
@@ -31,11 +32,21 @@ class ImageViewModel extends ChangeNotifier {
     try {
       final result  = await _repository.getImageResult(query);
 
-      _state = state.copyWith(
-        isLoading: false,
-        imageItem: result,
-      );
-      notifyListeners();
+      switch(result) {
+
+        case Success<List<ImageItem>>():
+          _state = state.copyWith(
+            isLoading: false,
+            imageItem: result.data.toList(),
+          );
+          notifyListeners();
+
+        case Error<List<ImageItem>>():
+          _state = state.copyWith(
+            isLoading: false,
+          );
+          notifyListeners();
+      }
       return true;
     }catch(e) {
       return false;
