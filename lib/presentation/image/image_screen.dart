@@ -36,14 +36,15 @@ class _ImageScreenState extends State<ImageScreen> {
                     content: const Text('데이터 가져오기 완료'),
                     actions: [
                       Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.red,
-                        ),
-                          child:
-                              TextButton(onPressed: () {
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.red,
+                          ),
+                          child: TextButton(
+                              onPressed: () {
                                 context.pop();
-                              }, child: const Text('확인'))),
+                              },
+                              child: const Text('확인'))),
                     ],
                   );
                 });
@@ -123,14 +124,55 @@ class _ImageScreenState extends State<ImageScreen> {
                     )
                   : Expanded(
                       child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 32,
-                            mainAxisSpacing: 32),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 32,
+                                mainAxisSpacing: 32),
                         itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
                           final imageItems = state.imageItem[index];
-                          return ImageWidget(imageItems: imageItems);
+                          return GestureDetector(
+                              onTap: () async {
+                                await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text('이미지 검색 앱'),
+                                        content: const Text('이미지 를 자세히 보시겠습니까'),
+                                        actions: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.red,
+                                            ),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                context.push('/hero',extra: imageItems);
+                                                context.pop();
+                                              },
+                                              child: const Text('확인'),
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              color: Colors.red,
+                                            ),
+                                            child: TextButton(
+                                              onPressed: () {
+                                                context.pop();
+                                              },
+                                              child: const Text('취소'),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              },
+                              child: ImageWidget(imageItems: imageItems));
                         },
                       ),
                     ),
