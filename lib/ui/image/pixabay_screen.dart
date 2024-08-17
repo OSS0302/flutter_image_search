@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
+import 'package:image_search_app/ui/image/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixabay_widget.dart';
 
 class PixabayScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final pixbaySearchController = TextEditingController();
+  final pixabayViewModel = PixabayViewModel();
 
   @override
   void dispose() {
@@ -52,7 +54,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       Icons.search_rounded,
                       color: Colors.pinkAccent,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      await pixabayViewModel
+                          .execute(pixbaySearchController.text);
                       setState(() {});
                     },
                   ),
@@ -61,35 +65,29 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              FutureBuilder(
-                  future: PixabayRepositoryImpl()
-                      .getPixabayItems(pixbaySearchController.text),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: Column(
-                          children: [
-                            CircularProgressIndicator(),
-                            Text('잠시만 기다려 주세요 로딩중 입니다.'),
-                          ],
-                        ),
-                      );
-                    }
-                    final pixabayItem = snapshot.data!;
-                    return Expanded(
+              pixabayViewModel.isLoadiing
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('잠시만 기다려 주세요 로딩중 입니다.'),
+                        ],
+                      ),
+                    )
+                  : Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             mainAxisSpacing: 32,
                             crossAxisSpacing: 32),
-                        itemCount: pixabayItem.length,
+                        itemCount: pixabayViewModel.pixabayItem.length,
                         itemBuilder: (context, index) {
-                          final pixabayItems = pixabayItem[index];
+                          final pixabayItems =
+                              pixabayViewModel.pixabayItem[index];
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                       ),
-                    );
-                  }),
+                    ),
             ],
           ),
         ),
