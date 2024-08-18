@@ -60,7 +60,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     ),
                     onPressed: () async {
                      final result = await pixabayViewModel
-                          .execute(pixbaySearchController.text);
+                          .fetchImage(pixbaySearchController.text);
                      if(result == false) {
                        const snackBar = SnackBar(content: Text('오류'));
                        if(mounted) {
@@ -75,7 +75,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
               SizedBox(
                 height: 24,
               ),
-              state.isLoadiing
+              state.isLoading
                   ? Center(
                       child: Column(
                         children: [
