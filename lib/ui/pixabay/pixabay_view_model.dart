@@ -12,23 +12,27 @@ class PixabayViewModel extends ChangeNotifier {
     required PixabayRepository repository,
   }) : _repository = repository;
 
-  PixabayState _state =  PixabayState(
+  PixabayState _state = PixabayState(
     isLoadiing: false,
     pixabayItem: List.unmodifiable([]),
   );
 
   PixabayState get state => _state;
 
-  Future<void> execute(String query) async {
+  Future<bool> execute(String query) async {
     _state = state.copyWith(
       isLoadiing: true,
     );
+    try {
+      final result = await _repository.getPixabayItems(query);
 
-    final result = await _repository.getPixabayItems(query);
-
-    _state = state.copyWith(
-      isLoadiing: false,
-      pixabayItem: result,
-    );
+      _state = state.copyWith(
+        isLoadiing: false,
+        pixabayItem: result,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }
