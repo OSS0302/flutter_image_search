@@ -1,6 +1,6 @@
 import 'package:go_router/go_router.dart';
-import 'package:image_search_app/ui/image/pixabay_screen.dart';
-import 'package:image_search_app/ui/image/pixabay_view_model.dart';
+import 'package:image_search_app/ui/pixabay/pixabay_screen.dart';
+import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:provider/provider.dart';
 
 import 'di/di_setup.dart';
