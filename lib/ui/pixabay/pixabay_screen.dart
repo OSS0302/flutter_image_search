@@ -1,6 +1,8 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixabay_widget.dart';
 import 'package:provider/provider.dart';
@@ -14,11 +16,50 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final pixbaySearchController = TextEditingController();
+  StreamSubscription<PixabayEvent>? subscription;
 
+  @override
+  void initState() {
+    Future.microtask(() {
+      subscription =
+          context.read<PixabayViewModel>().eventStream.listen((event) {
+        switch (event) {
+          case ShowSnackBar():
+            final snackBar = SnackBar(content: Text(event.message));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowDialog():
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('pixbay Image Search App'),
+                    content: Text('데이터 가져 오기 완료 '),
+                    actions: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.pinkAccent,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            context.pop();
+                          },
+                          child: Text('확인'),
+                        ),
+                      ),
+                    ],
+                  );
+                });
+        }
+      });
+    });
+    super.initState();
+  }
 
   @override
   void dispose() {
     pixbaySearchController.dispose();
+    subscription?.cancel();
     super.dispose();
   }
 
@@ -40,14 +81,14 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 decoration: InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       width: 2,
                       color: Colors.pinkAccent,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
+                    borderSide: const BorderSide(
                       width: 2,
                       color: Colors.pinkAccent,
                     ),
@@ -59,24 +100,24 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.pinkAccent,
                     ),
                     onPressed: () async {
-                     final result = await pixabayViewModel
+                      final result = await pixabayViewModel
                           .fetchImage(pixbaySearchController.text);
-                     if(result == false) {
-                       const snackBar = SnackBar(content: Text('오류'));
-                       if(mounted) {
-                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                       }
-                     }
+                      if (result == false) {
+                        const snackBar = SnackBar(content: Text('오류'));
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
+                      }
                       setState(() {});
                     },
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 24,
               ),
               state.isLoading
-                  ? Center(
+                  ? const Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
@@ -86,14 +127,14 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     )
                   : Expanded(
                       child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 32,
-                            crossAxisSpacing: 32),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                mainAxisSpacing: 32,
+                                crossAxisSpacing: 32),
                         itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
-                          final pixabayItems =
-                              state.pixabayItem[index];
+                          final pixabayItems = state.pixabayItem[index];
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                       ),
