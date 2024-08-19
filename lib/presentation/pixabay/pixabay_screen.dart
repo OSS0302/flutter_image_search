@@ -2,10 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
-import 'package:image_search_app/ui/widget/pixabay_widget.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:provider/provider.dart';
+
+import '../widget/pixabay_widget.dart';
 
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
@@ -32,8 +33,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 context: context,
                 builder: (context) {
                   return AlertDialog(
-                    title: Text('pixbay Image Search App'),
-                    content: Text('데이터 가져 오기 완료 '),
+                    title: const Text('pixbay Image Search App'),
+                    content: const Text('데이터 가져 오기 완료 '),
                     actions: [
                       Container(
                         decoration: BoxDecoration(
@@ -44,7 +45,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                           onPressed: () {
                             context.pop();
                           },
-                          child: Text('확인'),
+                          child: const Text('확인'),
                         ),
                       ),
                     ],
