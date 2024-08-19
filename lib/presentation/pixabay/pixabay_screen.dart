@@ -136,7 +136,45 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         itemCount: state.pixabayItem.length,
                         itemBuilder: (context, index) {
                           final pixabayItems = state.pixabayItem[index];
-                          return PixabayWidget(pixabayItems: pixabayItems);
+                          return GestureDetector(
+                            onTap: () async{
+                              await showDialog(context: context, builder: (context){
+                                return AlertDialog(
+                                  title: const Text('pixbay Image Search App'),
+                                  content: const Text('이미지를 자세히 보시겠습니까 '),
+                                  actions: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.pinkAccent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.push('/hero',extra: pixabayItems);
+                                          context.pop();
+                                        },
+                                        child: const Text('확인'),
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.pinkAccent,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: TextButton(
+                                        onPressed: () {
+                                          context.pop();
+                                        },
+                                        child: const Text('취소'),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).then((value) {
+                                if(value != null && value){}
+                              });
+                            },
+                              child: PixabayWidget(pixabayItems: pixabayItems));
                         },
                       ),
                     ),
