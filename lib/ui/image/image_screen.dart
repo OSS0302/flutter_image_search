@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:image_search_app/ui/image/image_view_model.dart';
 import 'package:image_search_app/ui/widget/image_widget.dart';
+import 'package:provider/provider.dart';
 
-import '../../data/model/image_item.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -13,7 +13,7 @@ class ImageScreen extends StatefulWidget {
 
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchSearchController = TextEditingController();
-  final imageViewModel = ImageViewModel();
+
 
   @override
   void dispose() {
@@ -23,9 +23,10 @@ class _ImageScreenState extends State<ImageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageViewModel = context.read<ImageViewModel>();
     return Scaffold(
       appBar: AppBar(
-        title: Text('image Search App'),
+        title: const Text('image Search App'),
       ),
       body: SafeArea(
         child: Padding(
@@ -55,8 +56,9 @@ class _ImageScreenState extends State<ImageScreen> {
                       Icons.search_rounded,
                       color: Colors.pink,
                     ),
-                    onPressed: () async{
-                      await imageViewModel.fetchImage(imageSearchSearchController.text);
+                    onPressed: () async {
+                      await imageViewModel
+                          .fetchImage(imageSearchSearchController.text);
                       setState(() {});
                     },
                   ),
@@ -65,34 +67,28 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              StreamBuilder<bool>(
-                  initialData: false,
-                  stream: imageViewModel.isLoadingStream, builder: (context,snapshot){
-                if(snapshot.data! == true ) {
-                  return Center(
-                    child: Column(
-                      children: [
-                        CircularProgressIndicator(),
-                        Text('로딩 중 입니다. 잠시만 기다려 주세요'),
-                      ],
+              imageViewModel.isLoading
+                  ? Center(
+                      child: Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          Text('로딩 중 입니다. 잠시만 기다려 주세요'),
+                        ],
+                      ),
+                    )
+                  : Expanded(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            mainAxisSpacing: 32,
+                            crossAxisSpacing: 32),
+                        itemCount: imageViewModel.imageItem.length,
+                        itemBuilder: (context, index) {
+                          final imageItems = imageViewModel.imageItem[index];
+                          return ImageWidget(imageItems: imageItems);
+                        },
+                      ),
                     ),
-                  );
-                }
-                return Expanded(
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        mainAxisSpacing: 32,
-                        crossAxisSpacing: 32),
-                    itemCount: imageViewModel.imageItem.length,
-                    itemBuilder: (context, index) {
-                      final imageItems = imageViewModel.imageItem[index];
-                      return ImageWidget(imageItems: imageItems);
-                    },
-                  ),
-                );
-              }),
-
             ],
           ),
         ),
