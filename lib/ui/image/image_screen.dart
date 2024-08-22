@@ -58,8 +58,14 @@ class _ImageScreenState extends State<ImageScreen> {
                       color: Colors.pink,
                     ),
                     onPressed: () async {
-                      await imageViewModel
+                     final result =  await imageViewModel
                           .fetchImage(imageSearchSearchController.text);
+                     if(result == false) {
+                       const snackBar = SnackBar(content: Text('오류'));
+                       if(mounted) {
+                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                       }
+                     }
                       setState(() {});
                     },
                   ),
@@ -85,7 +91,8 @@ class _ImageScreenState extends State<ImageScreen> {
                             crossAxisSpacing: 32),
                         itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
-                          final imageItems = state.imageItem[index];
+                          final imageItems = state
+                              .imageItem[index];
                           return ImageWidget(imageItems: imageItems);
                         },
                       ),
