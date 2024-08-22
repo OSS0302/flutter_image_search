@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:image_search_app/data/repository/image_repository_impl.dart';
+import 'package:image_search_app/ui/image/image_view_model.dart';
 import 'package:image_search_app/ui/widget/image_widget.dart';
+import 'package:provider/provider.dart';
+
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -12,6 +14,7 @@ class ImageScreen extends StatefulWidget {
 class _ImageScreenState extends State<ImageScreen> {
   final imageSearchSearchController = TextEditingController();
 
+
   @override
   void dispose() {
     imageSearchSearchController.dispose();
@@ -20,9 +23,11 @@ class _ImageScreenState extends State<ImageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageViewModel = context.read<ImageViewModel>();
+    final state = imageViewModel.state;
     return Scaffold(
       appBar: AppBar(
-        title: Text('image Search App'),
+        title: const Text('image Search App'),
       ),
       body: SafeArea(
         child: Padding(
@@ -52,36 +57,46 @@ class _ImageScreenState extends State<ImageScreen> {
                       Icons.search_rounded,
                       color: Colors.pink,
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                     final result =  await imageViewModel
+                          .fetchImage(imageSearchSearchController.text);
+                     if(result == false) {
+                       const snackBar = SnackBar(content: Text('오류'));
+                       if(mounted) {
+                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                       }
+                     }
                       setState(() {});
                     },
                   ),
                 ),
               ),
-              SizedBox(height: 24,),
-              FutureBuilder(future: ImageRepositoryImpl().getImageItem(
-                  imageSearchSearchController.text),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(child: Column(
+              SizedBox(
+                height: 24,
+              ),
+              state.isLoading
+                  ? Center(
+                      child: Column(
                         children: [
                           CircularProgressIndicator(),
                           Text('로딩 중 입니다. 잠시만 기다려 주세요'),
                         ],
-                      ),);
-                    }
-                    final imageItem = snapshot.data!;
-                    return Expanded(child: GridView.builder(
+                      ),
+                    )
+                  : Expanded(
+                      child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
                             mainAxisSpacing: 32,
                             crossAxisSpacing: 32),
-                        itemCount: imageItem.length,
+                        itemCount: state.imageItem.length,
                         itemBuilder: (context, index) {
-                          final imageItems = imageItem[index];
+                          final imageItems = state
+                              .imageItem[index];
                           return ImageWidget(imageItems: imageItems);
-                        }),);
-                  })
+                        },
+                      ),
+                    ),
             ],
           ),
         ),
