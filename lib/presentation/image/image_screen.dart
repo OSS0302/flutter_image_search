@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_search_app/ui/image/image_view_model.dart';
-import 'package:image_search_app/ui/widget/image_widget.dart';
 import 'package:provider/provider.dart';
 
+import '../widget/image_widget.dart';
 import 'image_event.dart';
+import 'image_view_model.dart';
 
 class ImageScreen extends StatefulWidget {
   const ImageScreen({super.key});
@@ -121,16 +121,14 @@ class _ImageScreenState extends State<ImageScreen> {
               SizedBox(
                 height: 24,
               ),
-              state.isLoading
-                  ? Center(
+              if (state.isLoading) Center(
                       child: Column(
                         children: [
                           CircularProgressIndicator(),
                           Text('로딩 중 입니다. 잠시만 기다려 주세요'),
                         ],
                       ),
-                    )
-                  : Expanded(
+                    ) else Expanded(
                       child: GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 4,
