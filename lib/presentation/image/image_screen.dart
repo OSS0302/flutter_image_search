@@ -151,7 +151,7 @@ class _ImageScreenState extends State<ImageScreen> {
                                       ),
                                       child: TextButton(
                                           onPressed: () {
-                                            context.push('/',extra: imageItems);
+                                            context.push('/hero',extra: imageItems);
                                             context.pop();
                                           },
                                           child: Text(
@@ -178,6 +178,8 @@ class _ImageScreenState extends State<ImageScreen> {
                                     ),
                                   ],
                                 );
+                              }).then((value) {
+                                if(value != null && value) {}
                               });
                             },
                               child: ImageWidget(imageItems: imageItems));
