@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixabay_widget.dart';
+import 'package:provider/provider.dart';
 
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
@@ -11,7 +13,7 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final textEditingController = TextEditingController();
-  final pixabayViewModel = PixabayViewModel();
+
 
   @override
   void dispose() {
@@ -21,6 +23,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final pixabayViewModel = context.read<PixabayViewModel>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('pixabay search App'),
@@ -58,7 +61,6 @@ class _PixabayScreenState extends State<PixabayScreen> {
                           .fetchImage(textEditingController.text);
                       setState(() {});
                     },
-
                   ),
                 ),
               ),
@@ -77,10 +79,11 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   : Expanded(
                       child: GridView.builder(
                         itemCount: pixabayViewModel.pixabayItem.length,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            crossAxisSpacing: 32,
-                            mainAxisSpacing: 32),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 4,
+                                crossAxisSpacing: 32,
+                                mainAxisSpacing: 32),
                         itemBuilder: (context, index) {
                           final pixabayItems =
                               pixabayViewModel.pixabayItem[index];
