@@ -24,6 +24,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
   @override
   Widget build(BuildContext context) {
     final pixabayViewModel = context.read<PixabayViewModel>();
+    final state = pixabayViewModel.state;
     return Scaffold(
       appBar: AppBar(
         title: const Text('pixabay search App'),
@@ -67,7 +68,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
               const SizedBox(
                 height: 24,
               ),
-              pixabayViewModel.isLoading
+              state.isLoading
                   ? const Center(
                       child: Column(
                         children: [
@@ -78,7 +79,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     )
                   : Expanded(
                       child: GridView.builder(
-                        itemCount: pixabayViewModel.pixabayItem.length,
+                        itemCount: state.pixabayItem.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 4,
@@ -86,7 +87,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                 mainAxisSpacing: 32),
                         itemBuilder: (context, index) {
                           final pixabayItems =
-                              pixabayViewModel.pixabayItem[index];
+                              state.pixabayItem[index];
                           return PixabayWidget(pixabayItems: pixabayItems);
                         },
                       ),
