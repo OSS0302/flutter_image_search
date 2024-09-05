@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_search_app/data/repository/pixabay_repository_impl.dart';
+import 'package:image_search_app/routes.dart';
+import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
 import 'package:image_search_app/ui/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/ui/widget/pixabay_widget.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +18,40 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final textEditingController = TextEditingController();
+  StreamSubscription<PixabayEvent>? subscription;
+
+  @override
+  void initState() {
+   Future.microtask((){
+     subscription =  context.read<PixabayViewModel>().eventStream.listen((event){
+       switch(event){
+
+         case ShowSnackBar():
+          final snackBar = SnackBar(content: Text(event.message));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+         case ShowDialog():
+           showDialog(context: context, builder: (context){
+             return AlertDialog(
+               title: Text('pixabay search App'),
+               content: Text('이미지 데이터 가져오기 완료'),
+               actions: [
+                 Container(
+                   decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(20),
+                     color: Colors.cyan,
+                   ),
+                   child: TextButton(onPressed: () {
+                     context.pop();
+                                }, child: Text('확인')),
+                 ),
+               ],
+             );
+           });
+       }
+     });
+   });
+    super.initState();
+  }
 
 
   @override
@@ -58,14 +97,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       color: Colors.cyan,
                     ),
                     onPressed: () async {
-                    final result =  await pixabayViewModel
+                     await pixabayViewModel
                           .fetchImage(textEditingController.text);
-                    if(result == false) {
-                      const snackBar = SnackBar(content: Text('오류'));
-                      if(mounted){
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    }
+
                       setState(() {});
                     },
                   ),
