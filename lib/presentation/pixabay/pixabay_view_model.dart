@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:image_search_app/core/result.dart';
 import 'package:image_search_app/domain/use_case/search_use_case.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_event.dart';
-import 'package:image_search_app/ui/pixabay/pixabay_state.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_state.dart';
 
 import '../../domain/model/pixabay_item.dart';
 import '../../domain/repository/pixabay_repository.dart';
