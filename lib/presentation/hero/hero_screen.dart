@@ -8,17 +8,26 @@ class HeroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Image.network(
-          pixabayItem.imageUrl,
-          fit: BoxFit.cover,
-          width: 400,
-          height: 400,
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title:  Text(pixabayItem.tags),
       ),
+      body: SafeArea(
+
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                pixabayItem.imageUrl,
+                fit: BoxFit.cover,
+                width: 400,
+                height: 400,
+              ),
+            ),
+          ),
+        ),
+
     );
   }
 }
