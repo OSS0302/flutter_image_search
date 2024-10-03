@@ -10,15 +10,27 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: router,
-      title: 'Flutter Demo',
+      title: 'Pixabay Image Search',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.cyan),
+        scaffoldBackgroundColor: Colors.grey.shade100,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.cyan,
+          foregroundColor: Colors.white,
+          titleTextStyle: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
+        snackBarTheme: const SnackBarThemeData(
+          backgroundColor: Colors.cyan,
+          contentTextStyle: TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
