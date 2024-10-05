@@ -11,7 +11,7 @@ import '../../domain/repository/pixabay_repository.dart';
 
 class PixabayViewModel with ChangeNotifier {
 
-   bool isLightMode = false;
+   bool isLightMode = true;
   final SearchUseCase _searchUseCase;
 
    PixabayViewModel({
