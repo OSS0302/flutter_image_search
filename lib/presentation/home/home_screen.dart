@@ -21,7 +21,7 @@ class HomeScreen extends StatelessWidget {
             _buildAppIcon(context, Icons.search, '이미지 검색', '/'),
             _buildAppIcon(context, Icons.photo, '갤러리', '/gallery'),
             _buildAppIcon(context, Icons.settings, '설정', '/settings'),
-            _buildAppIcon(context, Icons.person, '내 프로필', '/profile'),
+            _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen'),
             _buildAppIcon(context, Icons.notifications, '알림', '/notifications'),
             _buildAppIcon(context, Icons.help, '도움말', '/help'),
           ],
