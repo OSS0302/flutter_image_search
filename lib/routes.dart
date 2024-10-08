@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_search_app/presentation/component/gallery/gallery_screen.dart';
 import 'package:image_search_app/presentation/home/home_screen.dart';
+import 'package:image_search_app/presentation/pixabay/pixabay_screen.dart';
 import 'package:image_search_app/presentation/profile/profile_screen.dart';
 import 'package:image_search_app/presentation/setting/setting_screen.dart';
 
@@ -8,12 +10,12 @@ final router = GoRouter(
   routes: [
     GoRoute(
       path: '/',
-      builder: (context, state) => const HomeScreen(),
+      builder: (context, state) => const PixabayScreen(),
     ),
-    // GoRoute(
-    //   path: '/gallery',
-    //   builder: (context, state) => const GalleryScreen(), // 갤러리 화면 예시
-    // ),
+    GoRoute(
+      path: '/gallery',
+      builder: (context, state) => const GalleryScreen(), // 갤러리 화면 예시
+    ),
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(), // 설정 화면 예시
