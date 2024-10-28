@@ -18,7 +18,8 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 16, // 좌우 간격
           mainAxisSpacing: 16, // 상하 간격
           children: [
-            _buildAppIcon(context, Icons.search, '이미지 검색', '/pixabayScreen'),
+            //_buildAppIcon(context, Icons.search, '이미지 검색', '/pixabayScreen'),
+
             _buildAppIcon(context, Icons.photo, '갤러리', '/gallery'),
             _buildAppIcon(context, Icons.settings, '설정', '/settings'),
             _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen'),
