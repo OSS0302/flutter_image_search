@@ -209,7 +209,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                       child: Card(
                         color: pixabayViewModel.isLightMode
                             ? Colors.white
-                            : Colors.grey[800], // 배경색 설정
+                            : Colors.grey[800],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
