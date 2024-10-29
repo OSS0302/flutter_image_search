@@ -121,7 +121,7 @@ class _ImageScreenState extends State<ImageScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: const [
-                      CircularProgressIndicator(color: Colors.pink),
+                      CircularProgressIndicator(color: Colors.cyan),
                       SizedBox(height: 8),
                       Text('Loading, please wait...', style: TextStyle(color: Colors.black54)),
                     ],
