@@ -10,17 +10,21 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  static final ValueNotifier<ThemeMode> themeNotifier =
+  ValueNotifier(ThemeMode.light);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      routerConfig: router,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-
+    return ValueListenableBuilder(
+        valueListenable: themeNotifier,
+        builder: (context, value, child) {
+          return MaterialApp.router(
+            routerConfig: router,
+            title: 'Pixabay Image Search',
+            darkTheme: ThemeData.dark(),
+            themeMode: value,
+          );
+        }
     );
   }
 }
