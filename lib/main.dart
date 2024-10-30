@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_search_app/di/di_setup.dart';
 import 'package:image_search_app/routes.dart';
-import 'package:provider/provider.dart';
-
-import 'di/di_setup.dart';
 
 void main() {
   diSetup();
@@ -26,5 +24,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

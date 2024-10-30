@@ -1,19 +1,19 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'pixabay_item.dart';
+part of 'image_item.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$PixabayItemImpl _$$PixabayItemImplFromJson(Map<String, dynamic> json) =>
-    _$PixabayItemImpl(
+_$ImageItemImpl _$$ImageItemImplFromJson(Map<String, dynamic> json) =>
+    _$ImageItemImpl(
       imageUrl: json['imageUrl'] as String,
       tags: json['tags'] as String,
       id: (json['id'] as num).toInt(),
     );
 
-Map<String, dynamic> _$$PixabayItemImplToJson(_$PixabayItemImpl instance) =>
+Map<String, dynamic> _$$ImageItemImplToJson(_$ImageItemImpl instance) =>
     <String, dynamic>{
       'imageUrl': instance.imageUrl,
       'tags': instance.tags,
