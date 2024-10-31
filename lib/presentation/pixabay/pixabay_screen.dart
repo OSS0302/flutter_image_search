@@ -21,46 +21,45 @@ class _PixabayScreenState extends State<PixabayScreen> {
   @override
   void initState() {
     Future.microtask(() {
-      subscription =
-          context.read<PixabayViewModel>().eventStream.listen((event) {
-            switch (event) {
-              case ShowSnackBar():
-                final snackBar = SnackBar(
-                  content: Text(event.message),
-                  behavior: SnackBarBehavior.floating,
+      subscription = context.read<PixabayViewModel>().eventStream.listen((event) {
+        switch (event) {
+          case ShowSnackBar():
+            final snackBar = SnackBar(
+              content: Text(event.message),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              duration: const Duration(seconds: 2),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          case ShowDialog():
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  duration: const Duration(seconds: 2),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              case ShowDialog():
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                  title: const Text('Pixabay Search'),
+                  content: const Text('이미지 데이터 가져오기 완료!'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context); // 다이얼로그 닫기
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.cyan,
                       ),
-                      title: const Text('Pixabay Search'),
-                      content: const Text('이미지 데이터 가져오기 완료!'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            context.pop();
-                          },
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.cyan,
-                          ),
-                          child: const Text('확인'),
-                        ),
-                      ],
-                    );
-                  },
+                      child: const Text('확인'),
+                    ),
+                  ],
                 );
-            }
-          });
+              },
+            );
+        }
+      });
     });
     super.initState();
   }
@@ -82,6 +81,10 @@ class _PixabayScreenState extends State<PixabayScreen> {
         title: const Text('Pixabay Image Search'),
         elevation: 0,
         backgroundColor: Colors.cyan,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(), // 뒤로 가기 버튼 설정
+        ),
         actions: [
           IconButton(
             icon: pixabayViewModel.isLightMode
@@ -163,8 +166,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   : Expanded(
                 child: GridView.builder(
                   itemCount: state.pixabayItem.length,
-                  gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
@@ -185,9 +187,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    context.push('/hero',
-                                        extra: pixabayItems);
-                                    context.pop();
+                                    Navigator.pop(context); // 다이얼로그 닫기
+                                    context.push(
+                                        '/hero', extra: pixabayItems); // hero 페이지로 이동
                                   },
                                   style: TextButton.styleFrom(
                                     foregroundColor: Colors.white,
@@ -197,7 +199,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    context.pop();
+                                    Navigator.pop(context); // 다이얼로그 닫기
                                   },
                                   child: const Text('Cancel'),
                                 ),
