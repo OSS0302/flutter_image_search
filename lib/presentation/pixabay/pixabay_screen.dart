@@ -46,7 +46,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context); // 다이얼로그 닫기
+                        context.go('/'); // 다이얼로그 닫기
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -83,7 +83,13 @@ class _PixabayScreenState extends State<PixabayScreen> {
         backgroundColor: Colors.cyan,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(), // 뒤로 가기 버튼 설정
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();  // 뒤로 가기
+            } else {
+              context.go('/');  // 기본 페이지로 이동
+            }
+          },
         ),
         actions: [
           IconButton(
