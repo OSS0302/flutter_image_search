@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,7 +11,18 @@ class SettingsScreen extends StatelessWidget {
         title: const Text('설정'),
         backgroundColor: Colors.cyan,
         elevation: 0,
-      ),
+        leading:  IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context); // 뒤로 가기 기능 추가
+        } else {
+          context.go('/'); // 홈 화면으로 이동
+        }
+      },
+    ),
+
+    ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
