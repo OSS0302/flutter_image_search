@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:go_router/go_router.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -33,10 +34,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (context) {
-        TextEditingController nameController =
-        TextEditingController(text: _userName);
-        TextEditingController emailController =
-        TextEditingController(text: _userEmail);
+        TextEditingController nameController = TextEditingController(text: _userName);
+        TextEditingController emailController = TextEditingController(text: _userEmail);
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -96,6 +95,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // 뒤로 가기 기능 추가
+            } else {
+              context.go('/');
+            }
+          },
+        ),
         title: const Text('내 프로필'),
         backgroundColor: Colors.cyan,
         actions: [
