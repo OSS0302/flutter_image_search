@@ -128,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       radius: 60,
                       backgroundImage: _profileImage != null
                           ? FileImage(_profileImage!) as ImageProvider
-                          : const AssetImage('assets/default_profile.png'),
+                          : const NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFQcO-4Xn3BmOajGASg21cqBAAQvPz7zYpw&s'),
                     ),
                     Positioned(
                       bottom: 0,
