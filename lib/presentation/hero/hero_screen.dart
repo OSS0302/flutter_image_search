@@ -16,7 +16,7 @@ class HeroScreen extends StatelessWidget {
         title: Text(
           pixabayItem.tags,
           style: TextStyle(
-            color: isDarkMode ? Colors.white: Colors.black,
+            color: isDarkMode ? Colors.white : Colors.black, // 다크모드 텍스트 색상
           ),
         ),
         backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan, // 다크모드에 맞춰 색상 설정
@@ -28,11 +28,11 @@ class HeroScreen extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                color: isDarkMode ? Colors.white : Colors.black, // 다크모드일 경우 배경색 설정
+                color: isDarkMode ? Colors.black87 : Colors.white,
                 child: Image.network(
                   pixabayItem.imageUrl,
                   fit: BoxFit.cover,
-                  width: double.infinity, // 화면에 꽉 차게 설정
+                  width: double.infinity,
                   height: 400,
                 ),
               ),
@@ -40,7 +40,7 @@ class HeroScreen extends StatelessWidget {
           ),
         ),
       ),
-      backgroundColor: isDarkMode ? Colors.white : Colors.black, // 다크모드에 맞게 Scaffold 배경색 설정
+      backgroundColor: isDarkMode ? Colors.black87 : Colors.white,
     );
   }
 }
