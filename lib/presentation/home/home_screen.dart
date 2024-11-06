@@ -6,10 +6,13 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 테마에서 다크 모드인지 여부 확인
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('홈'),
-        backgroundColor: Colors.cyan,
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -18,19 +21,19 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
           children: [
-            _buildAppIcon(context, Icons.search, '이미지 검색', '/pixabayScreen'),
-            _buildAppIcon(context, Icons.photo, '갤러리', '/gallery'),
-            _buildAppIcon(context, Icons.settings, '설정', '/settings'),
-            _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen'),
-            _buildAppIcon(context, Icons.notifications, '알림', '/notifications'),
-            _buildAppIcon(context, Icons.help, '도움말', '/help'),
+            _buildAppIcon(context, Icons.search, '이미지 검색', '/pixabayScreen', isDarkMode),
+            _buildAppIcon(context, Icons.photo, '갤러리', '/gallery', isDarkMode),
+            _buildAppIcon(context, Icons.settings, '설정', '/settings', isDarkMode),
+            _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen', isDarkMode),
+            _buildAppIcon(context, Icons.notifications, '알림', '/notifications', isDarkMode),
+            _buildAppIcon(context, Icons.help, '도움말', '/help', isDarkMode),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildAppIcon(BuildContext context, IconData icon, String label, String route) {
+  Widget _buildAppIcon(BuildContext context, IconData icon, String label, String route, bool isDarkMode) {
     return GestureDetector(
       onTap: () {
         context.go(route);
@@ -39,6 +42,7 @@ class HomeScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
+        color: isDarkMode ? Colors.grey[800] : Colors.white,
         elevation: 4,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -46,12 +50,16 @@ class HomeScreen extends StatelessWidget {
             Icon(
               icon,
               size: 48,
-              color: Colors.cyan,
+              color: isDarkMode ? Colors.tealAccent : Colors.cyan,
             ),
             const SizedBox(height: 12),
             Text(
               label,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white70 : Colors.black87,
+              ),
             ),
           ],
         ),

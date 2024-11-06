@@ -10,21 +10,21 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static final ValueNotifier<ThemeMode> themeNotifier =
-  ValueNotifier(ThemeMode.light);
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: themeNotifier,
-        builder: (context, value, child) {
-          return MaterialApp.router(
-            routerConfig: router,
-            title: 'Pixabay Image Search',
-            darkTheme: ThemeData.dark(),
-            themeMode: value,
-          );
-        }
+      valueListenable: themeNotifier,
+      builder: (context, value, child) {
+        return MaterialApp.router(
+          routerConfig: router,
+          title: 'Pixabay Image Search',
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: value,
+        );
+      },
     );
   }
 }

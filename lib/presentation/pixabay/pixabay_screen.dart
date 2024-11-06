@@ -46,7 +46,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   actions: [
                     TextButton(
                       onPressed: () {
-                        context.go('/'); // 다이얼로그 닫기
+                       context.pop();
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -75,12 +75,13 @@ class _PixabayScreenState extends State<PixabayScreen> {
   Widget build(BuildContext context) {
     final pixabayViewModel = context.watch<PixabayViewModel>();
     final state = pixabayViewModel.state;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pixabay Image Search'),
         elevation: 0,
-        backgroundColor: Colors.cyan,
+        backgroundColor: isDarkMode ? Colors.black87 : Colors.cyan,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -93,9 +94,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
         ),
         actions: [
           IconButton(
-            icon: pixabayViewModel.isLightMode
-                ? const Icon(Icons.wb_sunny, color: Colors.yellow)
-                : const Icon(Icons.nightlight_round, color: Colors.white),
+            icon: isDarkMode
+                ? const Icon(Icons.nightlight_round, color: Colors.white)
+                : const Icon(Icons.wb_sunny, color: Colors.yellow),
             onPressed: () {
               setState(() {
                 pixabayViewModel.isLightMode = !pixabayViewModel.isLightMode;
@@ -110,7 +111,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
       ),
       body: SafeArea(
         child: Container(
-          color: pixabayViewModel.isLightMode ? Colors.white : Colors.black87,
+          color: isDarkMode ? Colors.black87 : Colors.white,
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,9 +131,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   labelText: 'Enter image keyword',
                   hintText: 'e.g. nature, car, animals',
                   filled: true,
-                  fillColor: pixabayViewModel.isLightMode
-                      ? Colors.grey[200]
-                      : Colors.grey[800],
+                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: const BorderSide(
@@ -151,8 +150,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     icon: const Icon(Icons.search_rounded),
                     color: Colors.cyan,
                     onPressed: () async {
-                      await pixabayViewModel
-                          .fetchImage(textEditingController.text);
+                      await pixabayViewModel.fetchImage(textEditingController.text);
                       setState(() {});
                     },
                   ),
@@ -215,11 +213,13 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         );
                       },
                       child: Card(
-                        color: pixabayViewModel.isLightMode
-                            ? Colors.white
-                            : Colors.grey[800],
+                        color: isDarkMode ? Colors.grey[800] : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
+                          side: BorderSide(
+                            color: isDarkMode ? Colors.white : Colors.black,
+                            width: 1.5,
+                          ),
                         ),
                         elevation: 4,
                         child: Column(
@@ -228,8 +228,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                             Expanded(
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                child: PixabayWidget(
-                                    pixabayItems: pixabayItems),
+                                child: PixabayWidget(pixabayItems: pixabayItems),
                               ),
                             ),
                             Padding(
@@ -238,9 +237,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                 pixabayItems.tags,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: pixabayViewModel.isLightMode
-                                      ? Colors.black
-                                      : Colors.white,
+                                  color: isDarkMode ? Colors.white : Colors.black,
                                 ),
                               ),
                             ),
