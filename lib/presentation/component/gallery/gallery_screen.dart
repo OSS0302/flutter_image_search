@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:go_router/go_router.dart';
 
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({super.key});
@@ -47,6 +48,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
       appBar: AppBar(
         title: const Text('갤러리'),
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor ?? Colors.cyan,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // 뒤로 가기 기능 추가
+            } else {
+              context.go('/');
+            }
+          },
+        ),
       ),
       body: Column(
         children: [
