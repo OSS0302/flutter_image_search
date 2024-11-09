@@ -42,17 +42,17 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     borderRadius: BorderRadius.circular(16),
                   ),
                   title: const Text('Pixabay Search'),
-                  content: const Text('이미지 데이터 가져오기 완료!'),
+                  content: const Text('Image data loaded!'),
                   actions: [
                     TextButton(
                       onPressed: () {
-                       context.pop();
+                        context.pop();
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: Colors.cyan,
                       ),
-                      child: const Text('확인'),
+                      child: const Text('OK'),
                     ),
                   ],
                 );
@@ -86,9 +86,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();  // 뒤로 가기
+              Navigator.of(context).pop();
             } else {
-              context.go('/');  // 기본 페이지로 이동
+              context.go('/');
             }
           },
         ),
@@ -111,66 +111,67 @@ class _PixabayScreenState extends State<PixabayScreen> {
       ),
       body: SafeArea(
         child: Container(
-          color: isDarkMode ? Colors.black87 : Colors.white,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isDarkMode
+                  ? [Colors.black87, Colors.grey[900]!]
+                  : [Colors.cyan[100]!, Colors.white],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Search for Images',
+              Text(
+                'Discover Beautiful Images',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.cyan,
+                  color: isDarkMode ? Colors.white : Colors.cyan[800],
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: textEditingController,
-                decoration: InputDecoration(
-                  labelText: 'Enter image keyword',
-                  hintText: 'e.g. nature, car, animals',
-                  filled: true,
-                  fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                      width: 2,
-                      color: Colors.cyan,
+              Material(
+                elevation: 8,
+                shadowColor: isDarkMode ? Colors.cyan : Colors.grey[200],
+                borderRadius: BorderRadius.circular(20),
+                child: TextField(
+                  controller: textEditingController,
+                  decoration: InputDecoration(
+                    labelText: 'Search images...',
+                    labelStyle: TextStyle(
+                      color: isDarkMode ? Colors.white70 : Colors.cyan[700],
                     ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    borderSide: const BorderSide(
-                      width: 2,
-                      color: Colors.cyan,
+                    filled: true,
+                    fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      borderSide: BorderSide.none,
                     ),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: const Icon(Icons.search_rounded),
-                    color: Colors.cyan,
-                    onPressed: () async {
-                      await pixabayViewModel.fetchImage(textEditingController.text);
-                      setState(() {});
-                    },
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search_rounded),
+                      color: Colors.cyan,
+                      onPressed: () async {
+                        await pixabayViewModel.fetchImage(
+                            textEditingController.text);
+                        setState(() {});
+                      },
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 24),
               state.isLoading
                   ? const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text('Fetching images...'),
-                  ],
-                ),
+                child: CircularProgressIndicator(),
               )
                   : Expanded(
                 child: GridView.builder(
                   itemCount: state.pixabayItem.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
                     crossAxisSpacing: 16,
                     mainAxisSpacing: 16,
@@ -191,9 +192,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.pop(context); // 다이얼로그 닫기
-                                    context.push(
-                                        '/hero', extra: pixabayItems); // hero 페이지로 이동
+                                    Navigator.pop(context);
+                                    context.push('/hero',
+                                        extra: pixabayItems);
                                   },
                                   style: TextButton.styleFrom(
                                     foregroundColor: Colors.white,
@@ -203,7 +204,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    Navigator.pop(context); // 다이얼로그 닫기
+                                    Navigator.pop(context);
                                   },
                                   child: const Text('Cancel'),
                                 ),
@@ -213,22 +214,44 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         );
                       },
                       child: Card(
-                        color: isDarkMode ? Colors.grey[800] : Colors.white,
+                        color: isDarkMode
+                            ? Colors.grey[800]
+                            : Colors.grey[50],
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
-                            color: isDarkMode ? Colors.white : Colors.black,
+                            color:
+                            isDarkMode ? Colors.white : Colors.cyan,
                             width: 1.5,
                           ),
                         ),
-                        elevation: 4,
+                        elevation: 6,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                child: PixabayWidget(pixabayItems: pixabayItems),
+                                child: Stack(
+                                  children: [
+                                    PixabayWidget(
+                                        pixabayItems: pixabayItems),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.transparent,
+                                            Colors.black54,
+                                          ],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                        ),
+                                        borderRadius:
+                                        BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                             Padding(
@@ -237,7 +260,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                 pixabayItems.tags,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: isDarkMode ? Colors.white : Colors.black,
+                                  color: isDarkMode
+                                      ? Colors.white70
+                                      : Colors.black87,
                                 ),
                               ),
                             ),
