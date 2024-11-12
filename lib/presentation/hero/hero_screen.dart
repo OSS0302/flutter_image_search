@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:image_search_app/domain/model/pixabay_item.dart';
 
@@ -8,80 +10,104 @@ class HeroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBodyBehindAppBar: true, // Extend the app bar over the image
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Text(
-          pixabayItem.tags,
+          '이미지 상세 보기',
           style: TextStyle(
-            color: isDarkMode ? Colors.white : Colors.black87,
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.2,
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
-        backgroundColor: isDarkMode ? Colors.grey[850] : Colors.cyan,
         iconTheme: IconThemeData(
-          color: isDarkMode ? Colors.white : Colors.black87,
+          color: isDarkMode ? Colors.white : Colors.black,
         ),
-        centerTitle: true,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: isDarkMode
-                ? [Colors.black, Colors.grey[850]!]
-                : [Colors.cyan[200]!, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+      body: Stack(
+        children: [
+          // Fullscreen blurred background image
+          Positioned.fill(
+            child: Image.network(
+              pixabayItem.imageUrl,
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Center(
-            child: GestureDetector(
-              onTapDown: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(12.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDarkMode
-                              ? Colors.black.withOpacity(0.5)
-                              : Colors.grey.withOpacity(0.3),
-                          blurRadius: 20,
-                          spreadRadius: 5,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                      border: Border.all(
-                        color: isDarkMode ? Colors.white : Colors.cyan,
-                        width: 2,
-                      ),
-                    ),
-                    child: Hero(
-                      tag: pixabayItem.imageUrl,
-                      child: Image.network(
-                        pixabayItem.imageUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: 450,
-                      ),
-                    ),
-                  ),
-                ),
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.4),
+            ),
+          ),
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), // Apply blur effect
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
               ),
             ),
           ),
-        ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Main centered image with a rounded rectangle frame
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: Image.network(
+                    pixabayItem.imageUrl,
+                    fit: BoxFit.contain,
+                    width: MediaQuery.of(context).size.width * 0.85,
+                    height: MediaQuery.of(context).size.height * 0.45,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // Information box with a transparent background
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        pixabayItem.tags,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'Resolution: 1920x1080', // Replace with actual resolution if available
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        'Image source: Pixabay', // Placeholder text
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      backgroundColor: isDarkMode ? Colors.black87 : Colors.grey[200],
+      backgroundColor: isDarkMode ? Colors.black : Colors.white,
     );
   }
 }
