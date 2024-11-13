@@ -6,7 +6,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 테마에서 다크 모드인지 여부 확인
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
@@ -14,20 +13,29 @@ class HomeScreen extends StatelessWidget {
         title: const Text('홈'),
         backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: [
-            _buildAppIcon(context, Icons.search, '이미지 검색', '/pixabayScreen', isDarkMode),
-            _buildAppIcon(context, Icons.photo, '갤러리', '/gallery', isDarkMode),
-            _buildAppIcon(context, Icons.settings, '설정', '/settings', isDarkMode),
-            _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen', isDarkMode),
-            _buildAppIcon(context, Icons.notifications, '알림', '/notifications', isDarkMode),
-            _buildAppIcon(context, Icons.help, '도움말', '/help', isDarkMode),
-          ],
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.teal],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: GridView.count(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            children: [
+              _buildAppIcon(context, Icons.search, '이미지 검색', '/pixabayScreen', isDarkMode),
+              _buildAppIcon(context, Icons.photo, '갤러리', '/gallery', isDarkMode),
+              _buildAppIcon(context, Icons.settings, '설정', '/settings', isDarkMode),
+              _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen', isDarkMode),
+              _buildAppIcon(context, Icons.notifications, '알림', '/notifications', isDarkMode),
+              _buildAppIcon(context, Icons.help, '도움말', '/help', isDarkMode),
+            ],
+          ),
         ),
       ),
     );
