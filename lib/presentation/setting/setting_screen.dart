@@ -29,7 +29,7 @@ class SettingsScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.white, Colors.teal],
+                colors: [Colors.teal, Colors.white],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -109,7 +109,7 @@ class SettingsScreen extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: isDarkMode ? Colors.black45 : Theme.of(context).cardColor, // Change background color based on theme
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -119,24 +119,30 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
         border: Border.all(
-          color: isDarkMode ? Colors.white54 : Colors.teal,
+          color: isDarkMode ? Colors.white54 : Colors.teal, // Border color changes based on theme
           width: 1.5,
         ),
       ),
       child: ListTile(
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: Colors.teal.shade700,
+          backgroundColor: isDarkMode ? Colors.teal.shade900 : Colors.teal.shade700, // Darker teal for dark mode
           child: Icon(icon, color: Colors.white, size: 28),
         ),
         title: Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
+            color: isDarkMode ? Colors.white : Colors.black, // Text color changes based on theme
           ),
         ),
-        subtitle: Text(subtitle),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white70 : Colors.black54, // Subtitle text color changes based on theme
+          ),
+        ),
         onTap: onTap,
         contentPadding: const EdgeInsets.all(16),
       ),
