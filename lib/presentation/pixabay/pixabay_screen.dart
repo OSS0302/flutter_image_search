@@ -20,6 +20,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
 
   @override
   void initState() {
+    super.initState();
     Future.microtask(() {
       subscription = context.read<PixabayViewModel>().eventStream.listen((event) {
         switch (event) {
@@ -61,7 +62,6 @@ class _PixabayScreenState extends State<PixabayScreen> {
         }
       });
     });
-    super.initState();
   }
 
   @override
@@ -81,7 +81,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
       appBar: AppBar(
         title: const Text('Pixabay Image Search'),
         elevation: 0,
-        backgroundColor: isDarkMode ? Colors.black87 : Colors.cyan,
+        backgroundColor: isDarkMode ? Colors.black : Colors.teal,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -98,9 +98,6 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 ? const Icon(Icons.nightlight_round, color: Colors.white)
                 : const Icon(Icons.wb_sunny, color: Colors.yellow),
             onPressed: () {
-              setState(() {
-                pixabayViewModel.isLightMode = !pixabayViewModel.isLightMode;
-              });
               MyApp.themeNotifier.value =
               MyApp.themeNotifier.value == ThemeMode.light
                   ? ThemeMode.dark
@@ -111,15 +108,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
       ),
       body: SafeArea(
         child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isDarkMode
-                  ? [Colors.black87, Colors.grey[900]!]
-                  : [Colors.cyan[100]!, Colors.white],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          color: isDarkMode ? Colors.black : Colors.white, // Background color
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,20 +118,20 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.cyan[800],
+                  color: isDarkMode ? Colors.white : Colors.teal[800],
                 ),
               ),
               const SizedBox(height: 16),
               Material(
                 elevation: 8,
-                shadowColor: isDarkMode ? Colors.cyan : Colors.grey[200],
+                shadowColor: isDarkMode ? Colors.teal : Colors.grey[200],
                 borderRadius: BorderRadius.circular(20),
                 child: TextField(
                   controller: textEditingController,
                   decoration: InputDecoration(
                     labelText: 'Search images...',
                     labelStyle: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.cyan[700],
+                      color: isDarkMode ? Colors.white70 : Colors.teal[700],
                     ),
                     filled: true,
                     fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
@@ -152,7 +141,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     ),
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.search_rounded),
-                      color: Colors.cyan,
+                      color: Colors.teal,
                       onPressed: () async {
                         await pixabayViewModel.fetchImage(
                             textEditingController.text);
@@ -198,7 +187,7 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                   },
                                   style: TextButton.styleFrom(
                                     foregroundColor: Colors.white,
-                                    backgroundColor: Colors.cyan,
+                                    backgroundColor: Colors.teal,
                                   ),
                                   child: const Text('Yes'),
                                 ),
@@ -220,8 +209,9 @@ class _PixabayScreenState extends State<PixabayScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                           side: BorderSide(
-                            color:
-                            isDarkMode ? Colors.white : Colors.cyan,
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.teal,
                             width: 1.5,
                           ),
                         ),

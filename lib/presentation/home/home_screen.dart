@@ -15,11 +15,16 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          gradient: isDarkMode
+              ? null // Dark mode: no gradient
+              : const LinearGradient(
             colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
+          color: isDarkMode
+              ? Colors.black
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
