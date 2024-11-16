@@ -7,6 +7,8 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -27,12 +29,17 @@ class SettingsScreen extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
+            decoration: BoxDecoration(
+              gradient: isDarkMode
+                  ? null // 다크 모드에서는 단색 배경
+                  : const LinearGradient(
                 colors: [Colors.teal, Colors.white],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
+              color: isDarkMode
+                  ? Colors.black54 // 다크 모드: 단색 검정 배경
+                  : null, // 라이트 모드: 그라데이션 적용
             ),
           ),
           ListView(
@@ -109,24 +116,30 @@ class SettingsScreen extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: isDarkMode ? Colors.black45 : Theme.of(context).cardColor, // Change background color based on theme
+        color: isDarkMode
+            ? Colors.grey[850] // 다크 모드: 어두운 회색 (이미지 참고 색상)
+            : Colors.white, // 라이트 모드: 밝은 흰색
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: isDarkMode ? Colors.black54 : Colors.black12, // 적절한 그림자 색상
             blurRadius: 8,
-            offset: Offset(2, 4),
+            offset: const Offset(2, 4),
           ),
         ],
         border: Border.all(
-          color: isDarkMode ? Colors.white54 : Colors.teal, // Border color changes based on theme
+          color: isDarkMode
+              ? Colors.tealAccent.withOpacity(0.6) // 다크 모드: 연한 Teal 색 테두리
+              : Colors.teal, // 라이트 모드: 기본 Teal 색 테두리
           width: 1.5,
         ),
       ),
       child: ListTile(
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: isDarkMode ? Colors.teal.shade900 : Colors.teal.shade700, // Darker teal for dark mode
+          backgroundColor: isDarkMode
+              ? Colors.teal.shade900 // 다크 모드: 어두운 teal
+              : Colors.teal.shade700, // 라이트 모드: 밝은 teal
           child: Icon(icon, color: Colors.white, size: 28),
         ),
         title: Text(
@@ -134,13 +147,13 @@ class SettingsScreen extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: isDarkMode ? Colors.white : Colors.black, // Text color changes based on theme
+            color: isDarkMode ? Colors.white : Colors.black, // 다크 모드: 흰색, 라이트 모드: 검정
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
-            color: isDarkMode ? Colors.white70 : Colors.black54, // Subtitle text color changes based on theme
+            color: isDarkMode ? Colors.white70 : Colors.black54, // 서브 타이틀 색상
           ),
         ),
         onTap: onTap,
