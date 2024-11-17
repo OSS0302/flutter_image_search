@@ -117,20 +117,20 @@ class SettingsScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: isDarkMode
-            ? Colors.grey[850] // 다크 모드: 어두운 회색 (이미지 참고 색상)
-            : Colors.white, // 라이트 모드: 밝은 흰색
+            ? Colors.black54 // 다크 모드: 어두운 반투명 색상
+            : Theme.of(context).cardColor, // 라이트 모드: 카드 테마 색상
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode ? Colors.black54 : Colors.black12, // 적절한 그림자 색상
+            color: Colors.black12,
             blurRadius: 8,
             offset: const Offset(2, 4),
           ),
         ],
         border: Border.all(
           color: isDarkMode
-              ? Colors.tealAccent.withOpacity(0.6) // 다크 모드: 연한 Teal 색 테두리
-              : Colors.teal, // 라이트 모드: 기본 Teal 색 테두리
+              ? Colors.white54 // 다크 모드: 흰색 테두리
+              : Colors.teal, // 라이트 모드: teal 테두리
           width: 1.5,
         ),
       ),
@@ -138,8 +138,8 @@ class SettingsScreen extends StatelessWidget {
         leading: CircleAvatar(
           radius: 24,
           backgroundColor: isDarkMode
-              ? Colors.teal.shade900 // 다크 모드: 어두운 teal
-              : Colors.teal.shade700, // 라이트 모드: 밝은 teal
+              ? Colors.teal.shade900
+              : Colors.teal.shade700,
           child: Icon(icon, color: Colors.white, size: 28),
         ),
         title: Text(

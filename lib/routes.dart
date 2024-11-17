@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_search_app/domain/model/pixabay_item.dart';
 import 'package:image_search_app/presentation/component/gallery/gallery_screen.dart';
+import 'package:image_search_app/presentation/help/help_screen.dart';
 import 'package:image_search_app/presentation/home/home_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
@@ -38,6 +39,10 @@ final router = GoRouter(
     GoRoute(
       path: '/ProfileScreen',
       builder: (context, state) => const ProfileScreen(),
+    ),
+    GoRoute(
+      path: '/helpScreen',
+      builder: (context, state) => const HelpScreen(),
     ),
     GoRoute(
       path: '/hero',

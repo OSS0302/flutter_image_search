@@ -38,7 +38,7 @@ class HomeScreen extends StatelessWidget {
               _buildAppIcon(context, Icons.settings, '설정', '/settings', isDarkMode),
               _buildAppIcon(context, Icons.person, '내 프로필', '/ProfileScreen', isDarkMode),
               _buildAppIcon(context, Icons.notifications, '알림', '/notifications', isDarkMode),
-              _buildAppIcon(context, Icons.help, '도움말', '/help', isDarkMode),
+              _buildAppIcon(context, Icons.help, '도움말', '/helpScreen', isDarkMode),
             ],
           ),
         ),
