@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AlarmScreen extends StatefulWidget {
   const AlarmScreen({super.key});
@@ -12,9 +15,27 @@ class _AlarmScreenState extends State<AlarmScreen> {
   final TextEditingController _alarmController = TextEditingController(); // 입력 필드 컨트롤러
 
   @override
+  void initState() {
+    super.initState();
+    _loadAlarms();
+  }
+
+  @override
   void dispose() {
     _alarmController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAlarms() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _alarms.addAll(prefs.getStringList('alarms') ?? []);
+    });
+  }
+
+  Future<void> _saveAlarms() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('alarms', _alarms);
   }
 
   void _addAlarm() {
@@ -22,6 +43,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
       setState(() {
         _alarms.add(_alarmController.text);
       });
+      _saveAlarms(); // 알림 저장
       _alarmController.clear(); // 입력 필드 초기화
     }
   }
@@ -30,6 +52,25 @@ class _AlarmScreenState extends State<AlarmScreen> {
     setState(() {
       _alarms.removeAt(index);
     });
+    _saveAlarms(); // 알림 저장
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      _addAlarmWithTime(picked);
+    }
+  }
+
+  void _addAlarmWithTime(TimeOfDay time) {
+    String alarmText = '알림: ${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+    setState(() {
+      _alarms.add(alarmText);
+    });
+    _saveAlarms(); // 알림 저장
   }
 
   @override
@@ -40,6 +81,16 @@ class _AlarmScreenState extends State<AlarmScreen> {
       appBar: AppBar(
         title: const Text('알림'),
         backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // Add back navigation functionality
+            } else {
+              context.go('/');
+            }
+          },
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -70,11 +121,11 @@ class _AlarmScreenState extends State<AlarmScreen> {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: _addAlarm,
+                    onPressed: () => _selectTime(context), // 시간 선택
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isDarkMode ? Colors.tealAccent : Colors.cyan,
                     ),
-                    child: const Text('추가'),
+                    child: const Text('시간 설정'),
                   ),
                 ],
               ),
@@ -100,6 +151,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
                       color: isDarkMode ? Colors.grey[800] : Colors.white,
                       elevation: 4,
                       child: ListTile(
+                        leading: Icon(
+                          Icons.alarm,
+                          color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+                        ),
                         title: Text(
                           _alarms[index],
                           style: TextStyle(
