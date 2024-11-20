@@ -7,9 +7,7 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -113,17 +111,13 @@ class SettingsScreen extends StatelessWidget {
     required String subtitle,
     required VoidCallback onTap,
   }) {
-    final isDarkMode = Theme
-        .of(context)
-        .brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       decoration: BoxDecoration(
         color: isDarkMode
-            ? Colors.black12
-            : Theme
-            .of(context)
-            .cardColor, // 라이트 모드: 카드 테마 색상
+            ? Colors.grey[850] // 다크 모드: 다크 카드 컬러
+            : Colors.teal[100], // 라이트 모드: teal 컬러
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
@@ -135,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
         border: Border.all(
           color: isDarkMode
               ? Colors.white54 // 다크 모드: 흰색 테두리
-              : Colors.black54, // 라이트 모드: teal 테두리
+              : Colors.teal, // 라이트 모드: teal 테두리
           width: 1.5,
         ),
       ),
@@ -152,14 +146,13 @@ class SettingsScreen extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
-            color: isDarkMode ? Colors.white : Colors
-                .black, // 다크 모드: 흰색, 라이트 모드: 검정
+            color: isDarkMode ? Colors.white : Colors.black,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
-            color: isDarkMode ? Colors.white70 : Colors.black54, // 서브 타이틀 색상
+            color: isDarkMode ? Colors.white70 : Colors.black54,
           ),
         ),
         onTap: onTap,
