@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:image_search_app/domain/model/pixabay_item.dart';
 
@@ -21,6 +20,8 @@ class HeroScreen extends StatelessWidget {
           '이미지 상세 보기',
           style: TextStyle(
             color: isDarkMode ? Colors.white : Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
           ),
         ),
         iconTheme: IconThemeData(
@@ -69,8 +70,15 @@ class HeroScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   margin: const EdgeInsets.symmetric(horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.5),
+                    color: Colors.black.withOpacity(0.6),
                     borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.5),
+                        blurRadius: 10,
+                        offset: Offset(0, 4), // changes position of shadow
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

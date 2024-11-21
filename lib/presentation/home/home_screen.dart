@@ -16,15 +16,13 @@ class HomeScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: isDarkMode
-              ? null // Dark mode: no gradient
+              ? null // 다크 모드: 그라데이션 없음
               : const LinearGradient(
             colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
-          color: isDarkMode
-              ? Colors.black
-              : null,
+          color: isDarkMode ? Colors.black : null,
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -51,30 +49,36 @@ class HomeScreen extends StatelessWidget {
       onTap: () {
         context.go(route);
       },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        color: isDarkMode ? Colors.grey[800] : Colors.white,
-        elevation: 4,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 48,
-              color: isDarkMode ? Colors.tealAccent : Colors.cyan,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.white70 : Colors.black87,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        transform: Matrix4.identity()..scale(1.05), // 터치 시 크기 증가
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          color: isDarkMode ? Colors.grey[800] : Colors.white,
+          elevation: 8, // 그림자 효과를 더 부드럽게
+          shadowColor: isDarkMode ? Colors.black54 : Colors.grey[300],
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 56, // 아이콘 크기 조정
+                color: isDarkMode ? Colors.tealAccent : Colors.cyan,
               ),
-            ),
-          ],
+              const SizedBox(height: 8), // 간격 조정
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 18, // 텍스트 크기 조정
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white70 : Colors.black87,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
