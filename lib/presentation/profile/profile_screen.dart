@@ -13,29 +13,43 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   File? _profileImage;
   final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
+
+  String _userName = "사용자 이름";
+  String _userEmail = "user@example.com";
 
   // 프로필 사진 변경 함수
   Future<void> _pickImageFromGallery() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
+    setState(() {
+      _isLoading = false;
+      if (pickedFile != null) {
         _profileImage = File(pickedFile.path);
-      });
-    }
+      }
+    });
   }
 
-  // 임시로 사용자 이름과 이메일을 저장
-  String _userName = "사용자 이름";
-  String _userEmail = "user@example.com";
+  // 프로필 사진 삭제
+  void _removeProfileImage() {
+    setState(() {
+      _profileImage = null;
+    });
+  }
 
   // 사용자 정보 수정 다이얼로그
   void _editProfile() {
     showDialog(
       context: context,
       builder: (context) {
-        TextEditingController nameController = TextEditingController(text: _userName);
-        TextEditingController emailController = TextEditingController(text: _userEmail);
+        TextEditingController nameController =
+        TextEditingController(text: _userName);
+        TextEditingController emailController =
+        TextEditingController(text: _userEmail);
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -72,12 +86,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context).pop();
               },
               child: const Text('저장'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
             ),
             TextButton(
               onPressed: () {
@@ -93,20 +101,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (Navigator.canPop(context)) {
-              Navigator.pop(context); // 뒤로 가기 기능 추가
+              Navigator.pop(context);
             } else {
               context.go('/');
             }
           },
         ),
         title: const Text('내 프로필'),
-        backgroundColor: Colors.cyan,
+        backgroundColor: isDarkMode ? Colors.black87 : Colors.cyan,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit),
@@ -114,9 +124,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: isDarkMode
+              ? null
+              : const LinearGradient(
+            colors: [Colors.teal, Colors.white],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          color: isDarkMode ? Colors.black87 : null,
+        ),
         child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
               // 프로필 이미지
@@ -128,13 +148,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       radius: 60,
                       backgroundImage: _profileImage != null
                           ? FileImage(_profileImage!) as ImageProvider
-                          : const NetworkImage('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFQcO-4Xn3BmOajGASg21cqBAAQvPz7zYpw&s'),
+                          : const NetworkImage(
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFQcO-4Xn3BmOajGASg21cqBAAQvPz7zYpw&s'),
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      )
+                          : null,
                     ),
                     Positioned(
                       bottom: 0,
                       right: 0,
-                      child: InkWell(
-                        onTap: _pickImageFromGallery,
+                      child: PopupMenuButton(
+                        onSelected: (value) {
+                          if (value == 'upload') {
+                            _pickImageFromGallery();
+                          } else if (value == 'remove') {
+                            _removeProfileImage();
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          const PopupMenuItem(
+                            value: 'upload',
+                            child: Text('사진 변경'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'remove',
+                            child: Text('사진 삭제'),
+                          ),
+                        ],
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: const BoxDecoration(
@@ -155,39 +197,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // 사용자 이름
               Text(
                 _userName,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
                 ),
               ),
               const SizedBox(height: 8),
               // 사용자 이메일
               Text(
                 _userEmail,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
-                  color: Colors.grey,
+                  color: isDarkMode ? Colors.white70 : Colors.grey,
                 ),
               ),
               const SizedBox(height: 32),
-              // 프로필 편집 버튼
+              // 프로필 수정 버튼
               ElevatedButton.icon(
                 onPressed: _editProfile,
                 icon: const Icon(Icons.edit),
                 label: const Text('프로필 수정'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyan,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 12,
-                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              // 프로필 정보를 더 추가할 수 있는 공간
+              // 추가 정보 카드
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -198,11 +237,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Icons.info_outline,
                     color: Colors.cyan,
                   ),
-                  title: const Text('프로필 정보 추가'),
-                  subtitle: const Text('자세한 프로필 정보를 입력하세요'),
+                  title: const Text('추가 정보'),
+                  subtitle: const Text('추가 프로필 정보를 입력하세요'),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
-                    // 추가 정보를 입력할 수 있는 기능 구현 예정
+                    // 추가 정보 입력 기능 구현
                   },
                 ),
               ),
@@ -213,3 +252,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
+
