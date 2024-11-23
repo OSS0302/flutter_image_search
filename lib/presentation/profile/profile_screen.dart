@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -241,7 +242,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   subtitle: const Text('추가 프로필 정보를 입력하세요'),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
-                    // 추가 정보 입력 기능 구현
+                    context.push('/additional-info');
                   },
                 ),
               ),

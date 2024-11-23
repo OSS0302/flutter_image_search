@@ -7,6 +7,7 @@ import 'package:image_search_app/presentation/help/help_screen.dart';
 import 'package:image_search_app/presentation/home/home_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
+import 'package:image_search_app/presentation/profile/add/additional_info_screen.dart';
 import 'package:image_search_app/presentation/profile/profile_screen.dart';
 import 'package:image_search_app/presentation/setting/setting_screen.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +49,10 @@ final router = GoRouter(
     GoRoute(
       path: '/alarmScreen',
       builder: (context, state) => const AlarmScreen(),
+    ),
+    GoRoute(
+      path: '/additional-info',
+      builder: (context, state) => const AdditionalInfoScreen(),
     ),
     GoRoute(
       path: '/hero',
