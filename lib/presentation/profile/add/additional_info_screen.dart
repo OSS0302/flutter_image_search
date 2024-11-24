@@ -48,71 +48,87 @@ class _AdditionalInfoScreenState extends State<AdditionalInfoScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              // 이름 입력
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: '이름',
-                  border: OutlineInputBorder(),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 이름 입력
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: '이름',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.cyan[50],
+                    prefixIcon: const Icon(Icons.person),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '이름을 입력하세요.';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '이름을 입력하세요.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              // 이메일 입력
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(
-                  labelText: '이메일',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                // 이메일 입력
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    labelText: '이메일',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.cyan[50],
+                    prefixIcon: const Icon(Icons.email),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '이메일을 입력하세요.';
+                    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                      return '유효한 이메일 형식을 입력하세요.';
+                    }
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '이메일을 입력하세요.';
-                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return '유효한 이메일 형식을 입력하세요.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              // 전화번호 입력
-              TextFormField(
-                controller: _phoneController,
-                decoration: const InputDecoration(
-                  labelText: '전화번호',
-                  border: OutlineInputBorder(),
+                const SizedBox(height: 16),
+                // 전화번호 입력
+                TextFormField(
+                  controller: _phoneController,
+                  decoration: InputDecoration(
+                    labelText: '전화번호',
+                    border: OutlineInputBorder(),
+                    filled: true,
+                    fillColor: Colors.cyan[50],
+                    prefixIcon: const Icon(Icons.phone),
+                  ),
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '전화번호를 입력하세요.';
+                    } else if (!RegExp(r'^[0-9]{10,11}$').hasMatch(value)) {
+                      return '유효한 전화번호를 입력하세요.';
+                    }
+                    return null;
+                  },
                 ),
-                keyboardType: TextInputType.phone,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '전화번호를 입력하세요.';
-                  } else if (!RegExp(r'^[0-9]{10,11}$').hasMatch(value)) {
-                    return '유효한 전화번호를 입력하세요.';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 32),
-              // 저장 버튼
-              ElevatedButton(
-                onPressed: _saveInfo,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
+                const SizedBox(height: 32),
+                // 저장 버튼
+                ElevatedButton(
+                  onPressed: _saveInfo,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyan,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: const Text(
+                    '저장',
+                    style: TextStyle(fontSize: 18),
                   ),
                 ),
-                child: const Text('저장'),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
