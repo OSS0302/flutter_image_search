@@ -94,7 +94,12 @@ class _AlarmScreenState extends State<AlarmScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          color: isDarkMode
+              ? Colors.black // 다크 모드: 단색 검정 배경
+              : null, // 라이트 모드: 그라데이션 적용
+          gradient: isDarkMode
+              ? null // 다크 모드: 그라데이션 제거
+              : const LinearGradient( // 라이트 모드: 기존 그라데이션
             colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
