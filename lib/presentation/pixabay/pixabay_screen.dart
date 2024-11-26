@@ -23,42 +23,41 @@ class _PixabayScreenState extends State<PixabayScreen> {
     super.initState();
     Future.microtask(() {
       subscription = context.read<PixabayViewModel>().eventStream.listen((event) {
-        switch (event) {
-          case ShowSnackBar():
-            final snackBar = SnackBar(
-              content: Text(event.message),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              duration: const Duration(seconds: 2),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          case ShowDialog():
-            showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  title: const Text('Pixabay Search'),
-                  content: const Text('Image data loaded!'),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        context.pop();
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.cyan,
-                      ),
-                      child: const Text('OK'),
+        if (event is ShowSnackBar) {
+          final snackBar = SnackBar(
+            content: Text(event.message),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            duration: const Duration(seconds: 2),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        } else if (event is ShowDialog) {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                title: const Text('Pixabay Search'),
+                content: const Text('Image data loaded!'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      context.pop();
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.cyan,
                     ),
-                  ],
-                );
-              },
-            );
+                    child: const Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
         }
       });
     });
@@ -69,6 +68,12 @@ class _PixabayScreenState extends State<PixabayScreen> {
     textEditingController.dispose();
     subscription?.cancel();
     super.dispose();
+  }
+
+  Future<void> _searchImages(BuildContext context) async {
+    final pixabayViewModel = context.read<PixabayViewModel>();
+    await pixabayViewModel.fetchImage(textEditingController.text);
+    setState(() {});
   }
 
   @override
@@ -94,6 +99,10 @@ class _PixabayScreenState extends State<PixabayScreen> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search_rounded),
+            onPressed: () => _searchImages(context),
+          ),
+          IconButton(
             icon: isDarkMode
                 ? const Icon(Icons.nightlight_round, color: Colors.white)
                 : const Icon(Icons.wb_sunny, color: Colors.yellow),
@@ -108,20 +117,13 @@ class _PixabayScreenState extends State<PixabayScreen> {
       ),
       body: SafeArea(
         child: Container(
-          color: isDarkMode ? Colors.black : Colors.white, // Background color
+          decoration: BoxDecoration(
+            color: isDarkMode ? Colors.black : Colors.white,
+          ),
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Discover Beautiful Images',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.teal[800],
-                ),
-              ),
-              const SizedBox(height: 16),
               Material(
                 elevation: 8,
                 shadowColor: isDarkMode ? Colors.teal : Colors.grey[200],
@@ -142,22 +144,29 @@ class _PixabayScreenState extends State<PixabayScreen> {
                     suffixIcon: IconButton(
                       icon: const Icon(Icons.search_rounded),
                       color: Colors.teal,
-                      onPressed: () async {
-                        await pixabayViewModel.fetchImage(
-                            textEditingController.text);
-                        setState(() {});
-                      },
+                      onPressed: () => _searchImages(context),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              state.isLoading
-                  ? const Center(
-                child: CircularProgressIndicator(),
-              )
-                  : Expanded(
-                child: GridView.builder(
+              const SizedBox(height: 16),
+              Expanded(
+                child: state.isLoading
+                    ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+                    : state.pixabayItem.isEmpty
+                    ? Center(
+                  child: Text(
+                    '검색 결과가 없습니다.',
+                    style: TextStyle(
+                      color: isDarkMode
+                          ? Colors.white70
+                          : Colors.grey[700],
+                    ),
+                  ),
+                )
+                    : GridView.builder(
                   itemCount: state.pixabayItem.length,
                   gridDelegate:
                   const SliverGridDelegateWithFixedCrossAxisCount(
@@ -168,95 +177,74 @@ class _PixabayScreenState extends State<PixabayScreen> {
                   itemBuilder: (context, index) {
                     final pixabayItems = state.pixabayItem[index];
                     return GestureDetector(
-                      onTap: () async {
-                        await showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              title: const Text('Pixabay Image'),
-                              content: const Text('View image details?'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    context.push('/hero',
-                                        extra: pixabayItems);
-                                  },
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor: Colors.teal,
-                                  ),
-                                  child: const Text('Yes'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      child: Card(
-                        color: isDarkMode
-                            ? Colors.grey[800]
-                            : Colors.grey[50],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          side: BorderSide(
-                            color: isDarkMode
-                                ? Colors.white
-                                : Colors.teal,
-                            width: 1.5,
+                      onTap: () => context.push('/hero',
+                          extra: pixabayItems),
+                      child: Hero(
+                        tag: pixabayItems.id,
+                        child: Card(
+                          color: isDarkMode
+                              ? Colors.grey[800]
+                              : Colors.grey[50],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: BorderSide(
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Colors.teal,
+                              width: 1.5,
+                            ),
                           ),
-                        ),
-                        elevation: 6,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Stack(
-                                  children: [
-                                    PixabayWidget(
-                                        pixabayItems: pixabayItems),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black54,
-                                          ],
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
+                          elevation: 6,
+                          child: Column(
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius:
+                                  BorderRadius.circular(16),
+                                  child: Image.network(
+                                    pixabayItems.imageUrl,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    loadingBuilder: (context, child,
+                                        loadingProgress) {
+                                      if (loadingProgress == null) {
+                                        return child;
+                                      }
+                                      return Center(
+                                        child:
+                                        CircularProgressIndicator(
+                                          value: loadingProgress
+                                              .expectedTotalBytes !=
+                                              null
+                                              ? loadingProgress
+                                              .cumulativeBytesLoaded /
+                                              (loadingProgress
+                                                  .expectedTotalBytes ??
+                                                  1)
+                                              : null,
                                         ),
-                                        borderRadius:
-                                        BorderRadius.circular(16),
-                                      ),
-                                    ),
-                                  ],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                pixabayItems.tags,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: isDarkMode
-                                      ? Colors.white70
-                                      : Colors.black87,
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  pixabayItems.tags,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDarkMode
+                                        ? Colors.white70
+                                        : Colors.black87,
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     );
