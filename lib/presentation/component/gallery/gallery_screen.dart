@@ -13,7 +13,7 @@ class GalleryScreen extends StatefulWidget {
 class _GalleryScreenState extends State<GalleryScreen> {
   List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
-  final int _maxImages = 10; // Maximum image selection limit
+  final int _maxImages = 10;
 
   Future<void> _pickImages() async {
     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
@@ -41,52 +41,93 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('갤러리'),
-        backgroundColor: Colors.cyan,
+        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (Navigator.canPop(context)) {
-              Navigator.pop(context); // Add back navigation functionality
+              Navigator.pop(context);
             } else {
               context.go('/');
             }
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: isDarkMode
+              ? LinearGradient(
+            colors: [Colors.black, Colors.grey[800]!],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          )
+              : LinearGradient(
+            colors: [Colors.white, Colors.teal[50]!],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton.icon(
-              onPressed: _pickImages,
-              icon: const Icon(Icons.photo_library),
-              label: const Text('갤러리에서 이미지 선택'),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-                backgroundColor: Colors.cyan,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                elevation: 4,
+            // 헤더: 이미지 수 표시 및 추가 버튼
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '선택된 이미지: ${_selectedImages.length} / $_maxImages',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: isDarkMode ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: _pickImages,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('추가'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDarkMode ? Colors.tealAccent : Colors.cyan,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            Text(
-              '선택된 이미지 수: ${_selectedImages.length} / $_maxImages',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Expanded(
               child: _selectedImages.isEmpty
-                  ? const Center(child: Text('선택된 이미지가 없습니다.', style: TextStyle(fontSize: 16, color: Colors.grey)))
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.photo_library,
+                      size: 80,
+                      color: isDarkMode ? Colors.white54 : Colors.grey,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      '이미지를 선택해주세요.',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: isDarkMode ? Colors.white70 : Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              )
                   : GridView.builder(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(16),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   crossAxisSpacing: 12,
@@ -95,6 +136,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 itemCount: _selectedImages.length,
                 itemBuilder: (context, index) {
                   return Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       Container(
                         decoration: BoxDecoration(
@@ -118,13 +160,13 @@ class _GalleryScreenState extends State<GalleryScreen> {
                         ),
                       ),
                       Positioned(
-                        right: 6,
-                        top: 6,
+                        top: -8,
+                        right: -8,
                         child: GestureDetector(
                           onTap: () => _removeImage(index),
                           child: Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.redAccent,
                             ),
