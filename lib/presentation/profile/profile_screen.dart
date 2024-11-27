@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
@@ -19,7 +18,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _userName = "사용자 이름";
   String _userEmail = "user@example.com";
 
-  // 프로필 사진 변경 함수
   Future<void> _pickImageFromGallery() async {
     setState(() {
       _isLoading = true;
@@ -35,22 +33,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  // 프로필 사진 삭제
   void _removeProfileImage() {
-    setState(() {
-      _profileImage = null;
-    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('프로필 사진 삭제'),
+          content: const Text('정말로 프로필 사진을 삭제하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _profileImage = null;
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('삭제'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  // 사용자 정보 수정 다이얼로그
   void _editProfile() {
     showDialog(
       context: context,
       builder: (context) {
-        TextEditingController nameController =
-        TextEditingController(text: _userName);
-        TextEditingController emailController =
-        TextEditingController(text: _userEmail);
+        final nameController = TextEditingController(text: _userName);
+        final emailController = TextEditingController(text: _userEmail);
 
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -60,24 +77,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(
                   labelText: '이름',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '이름을 입력하세요.';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
-              TextField(
+              TextFormField(
                 controller: emailController,
                 decoration: const InputDecoration(
                   labelText: '이메일',
                   border: OutlineInputBorder(),
                 ),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '이메일을 입력하세요.';
+                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return '유효한 이메일 형식을 입력하세요.';
+                  }
+                  return null;
+                },
               ),
             ],
           ),
           actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
             ElevatedButton(
               onPressed: () {
                 setState(() {
@@ -87,12 +125,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context).pop();
               },
               child: const Text('저장'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('취소'),
             ),
           ],
         );
@@ -140,7 +172,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // 프로필 이미지
               Center(
                 child: Stack(
                   alignment: Alignment.bottomRight,
@@ -180,9 +211,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                         child: Container(
                           padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.cyan,
+                            color: isDarkMode ? Colors.teal : Colors.cyan,
                           ),
                           child: const Icon(
                             Icons.camera_alt,
@@ -195,7 +226,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              // 사용자 이름
               Text(
                 _userName,
                 style: TextStyle(
@@ -205,7 +235,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 8),
-              // 사용자 이메일
               Text(
                 _userEmail,
                 style: TextStyle(
@@ -214,20 +243,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               const SizedBox(height: 32),
-              // 프로필 수정 버튼
               ElevatedButton.icon(
                 onPressed: _editProfile,
                 icon: const Icon(Icons.edit),
                 label: const Text('프로필 수정'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.cyan,
+                  backgroundColor: isDarkMode ? Colors.teal : Colors.cyan,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
               const SizedBox(height: 16),
-              // 추가 정보 카드
               Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -253,5 +280,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
 
 
