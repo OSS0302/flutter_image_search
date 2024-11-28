@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +12,8 @@ class AlarmScreen extends StatefulWidget {
 }
 
 class _AlarmScreenState extends State<AlarmScreen> {
-  final List<String> _alarms = []; // 알림 목록
-  final TextEditingController _alarmController = TextEditingController(); // 입력 필드 컨트롤러
+  final List<Map<String, dynamic>> _alarms = []; // 알림 리스트
+  final TextEditingController _alarmController = TextEditingController();
 
   @override
   void initState() {
@@ -28,31 +29,53 @@ class _AlarmScreenState extends State<AlarmScreen> {
 
   Future<void> _loadAlarms() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _alarms.addAll(prefs.getStringList('alarms') ?? []);
-    });
+    final String? savedAlarms = prefs.getString('alarms');
+    if (savedAlarms != null) {
+      setState(() {
+        _alarms.addAll(List<Map<String, dynamic>>.from(json.decode(savedAlarms)));
+      });
+    }
   }
 
   Future<void> _saveAlarms() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList('alarms', _alarms);
+    prefs.setString('alarms', json.encode(_alarms));
   }
 
-  void _addAlarm() {
-    if (_alarmController.text.isNotEmpty) {
-      setState(() {
-        _alarms.add(_alarmController.text);
-      });
-      _saveAlarms(); // 알림 저장
-      _alarmController.clear(); // 입력 필드 초기화
+  void _addAlarm(TimeOfDay? time) {
+    if (time == null || _alarmController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('시간과 내용을 입력하세요!')),
+      );
+      return;
     }
+
+    final alarmText =
+        '${time.hour}:${time.minute.toString().padLeft(2, '0')} - ${_alarmController.text}';
+    setState(() {
+      _alarms.add({
+        'text': alarmText,
+        'time': time,
+        'enabled': true,
+      });
+      _alarms.sort((a, b) => a['time'].hour.compareTo(b['time'].hour)); // 시간순 정렬
+    });
+    _saveAlarms();
+    _alarmController.clear();
   }
 
   void _removeAlarm(int index) {
     setState(() {
       _alarms.removeAt(index);
     });
-    _saveAlarms(); // 알림 저장
+    _saveAlarms();
+  }
+
+  void _toggleAlarm(int index) {
+    setState(() {
+      _alarms[index]['enabled'] = !_alarms[index]['enabled'];
+    });
+    _saveAlarms();
   }
 
   Future<void> _selectTime(BuildContext context) async {
@@ -61,16 +84,8 @@ class _AlarmScreenState extends State<AlarmScreen> {
       initialTime: TimeOfDay.now(),
     );
     if (picked != null) {
-      _addAlarmWithTime(picked);
+      _addAlarm(picked);
     }
-  }
-
-  void _addAlarmWithTime(TimeOfDay time) {
-    String alarmText = '알림: ${time.hour}:${time.minute.toString().padLeft(2, '0')}';
-    setState(() {
-      _alarms.add(alarmText);
-    });
-    _saveAlarms(); // 알림 저장
   }
 
   @override
@@ -85,7 +100,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (Navigator.canPop(context)) {
-              Navigator.pop(context); // Add back navigation functionality
+              Navigator.pop(context);
             } else {
               context.go('/');
             }
@@ -94,12 +109,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.black // 다크 모드: 단색 검정 배경
-              : null, // 라이트 모드: 그라데이션 적용
+          color: isDarkMode ? Colors.black : null,
           gradient: isDarkMode
-              ? null // 다크 모드: 그라데이션 제거
-              : const LinearGradient( // 라이트 모드: 기존 그라데이션
+              ? null
+              : const LinearGradient(
             colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -126,9 +139,10 @@ class _AlarmScreenState extends State<AlarmScreen> {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: () => _selectTime(context), // 시간 선택
+                    onPressed: () => _selectTime(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isDarkMode ? Colors.tealAccent : Colors.cyan,
+                      backgroundColor:
+                      isDarkMode ? Colors.tealAccent : Colors.cyan,
                     ),
                     child: const Text('시간 설정'),
                   ),
@@ -149,6 +163,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
                     : ListView.builder(
                   itemCount: _alarms.length,
                   itemBuilder: (context, index) {
+                    final alarm = _alarms[index];
                     return Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -157,21 +172,42 @@ class _AlarmScreenState extends State<AlarmScreen> {
                       elevation: 4,
                       child: ListTile(
                         leading: Icon(
-                          Icons.alarm,
-                          color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+                          alarm['enabled']
+                              ? Icons.alarm
+                              : Icons.alarm_off,
+                          color: alarm['enabled']
+                              ? (isDarkMode
+                              ? Colors.tealAccent
+                              : Colors.cyan)
+                              : Colors.grey,
                         ),
                         title: Text(
-                          _alarms[index],
+                          alarm['text'],
                           style: TextStyle(
-                            color: isDarkMode ? Colors.white : Colors.black87,
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
                           ),
                         ),
-                        trailing: IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: isDarkMode ? Colors.redAccent : Colors.red,
-                          ),
-                          onPressed: () => _removeAlarm(index),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Switch(
+                              value: alarm['enabled'],
+                              onChanged: (value) =>
+                                  _toggleAlarm(index), // 알림 활성/비활성
+                              activeColor: Colors.tealAccent,
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: isDarkMode
+                                    ? Colors.redAccent
+                                    : Colors.red,
+                              ),
+                              onPressed: () => _removeAlarm(index),
+                            ),
+                          ],
                         ),
                       ),
                     );
