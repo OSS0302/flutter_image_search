@@ -27,19 +27,36 @@ class _AlarmScreenState extends State<AlarmScreen> {
     super.dispose();
   }
 
-  Future<void> _loadAlarms() async {
+  Future<void> _saveAlarms() async {
     final prefs = await SharedPreferences.getInstance();
-    final String? savedAlarms = prefs.getString('alarms');
-    if (savedAlarms != null) {
-      setState(() {
-        _alarms.addAll(List<Map<String, dynamic>>.from(json.decode(savedAlarms)));
-      });
+    try {
+      // JSON 문자열로 변환하여 저장
+      final String jsonData = json.encode(_alarms);
+      await prefs.setString('alarms', jsonData);
+    } catch (e) {
+      debugPrint('알림 데이터를 저장하는 중 오류 발생: $e');
     }
   }
 
-  Future<void> _saveAlarms() async {
+  Future<void> _loadAlarms() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('alarms', json.encode(_alarms));
+    final String? savedAlarms = prefs.getString('alarms'); // JSON 문자열 가져오기
+
+    if (savedAlarms != null) {
+      try {
+        // 저장된 JSON 문자열을 디코딩하여 리스트로 변환
+        final List<dynamic> decodedData = json.decode(savedAlarms);
+        setState(() {
+          _alarms.addAll(
+            decodedData.map((e) => Map<String, dynamic>.from(e)),
+          );
+        });
+      } catch (e) {
+        // 잘못된 데이터가 있을 경우 초기화
+        debugPrint('손상된 데이터 발견: $e');
+        await prefs.remove('alarms'); // 잘못된 데이터 삭제
+      }
+    }
   }
 
   void _addAlarm(TimeOfDay? time) {
@@ -55,10 +72,13 @@ class _AlarmScreenState extends State<AlarmScreen> {
     setState(() {
       _alarms.add({
         'text': alarmText,
-        'time': time,
+        'time': {'hour': time.hour, 'minute': time.minute},
         'enabled': true,
       });
-      _alarms.sort((a, b) => a['time'].hour.compareTo(b['time'].hour)); // 시간순 정렬
+      _alarms.sort((a, b) =>
+      a['time']['hour'].compareTo(b['time']['hour']) != 0
+          ? a['time']['hour'].compareTo(b['time']['hour'])
+          : a['time']['minute'].compareTo(b['time']['minute'])); // 시간순 정렬
     });
     _saveAlarms();
     _alarmController.clear();
@@ -156,7 +176,9 @@ class _AlarmScreenState extends State<AlarmScreen> {
                     '등록된 알림이 없습니다.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                      color: isDarkMode
+                          ? Colors.white70
+                          : Colors.black54,
                     ),
                   ),
                 )
@@ -168,7 +190,8 @@ class _AlarmScreenState extends State<AlarmScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      color: isDarkMode ? Colors.grey[800] : Colors.white,
+                      color:
+                      isDarkMode ? Colors.grey[800] : Colors.white,
                       elevation: 4,
                       child: ListTile(
                         leading: Icon(
@@ -195,7 +218,7 @@ class _AlarmScreenState extends State<AlarmScreen> {
                             Switch(
                               value: alarm['enabled'],
                               onChanged: (value) =>
-                                  _toggleAlarm(index), // 알림 활성/비활성
+                                  _toggleAlarm(index),
                               activeColor: Colors.tealAccent,
                             ),
                             IconButton(
