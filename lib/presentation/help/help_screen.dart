@@ -12,20 +12,25 @@ class HelpScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('도움말'),
         backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back),
-        onPressed: () {
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop();
-          } else {
-            context.go('/');
-          }
-        },
-      ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: LinearGradient(
+          color: isDarkMode
+              ? Colors.black // 다크 모드: 검은색 배경
+              : null, // 라이트 모드: 기본 배경 (그라데이션 포함)
+          gradient: isDarkMode
+              ? null // 다크 모드에서는 그라데이션 제거
+              : const LinearGradient(
             colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
