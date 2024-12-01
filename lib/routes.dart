@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_search_app/domain/model/pixabay_item.dart';
+import 'package:image_search_app/presentation/FAQ/faq_screen.dart';
 import 'package:image_search_app/presentation/alarm/alaram_screen.dart';
 import 'package:image_search_app/presentation/component/gallery/gallery_screen.dart';
 import 'package:image_search_app/presentation/help/help_screen.dart';
@@ -53,6 +54,10 @@ final router = GoRouter(
     GoRoute(
       path: '/additional-info',
       builder: (context, state) => const AdditionalInfoScreen(),
+    ),
+    GoRoute(
+      path: '/FAQScreen',
+      builder: (context, state) => const FAQScreen(),
     ),
     GoRoute(
       path: '/hero',

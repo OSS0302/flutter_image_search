@@ -1,12 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class HelpScreen extends StatelessWidget {
+class HelpScreen extends StatefulWidget {
   const HelpScreen({super.key});
+
+  @override
+  State<HelpScreen> createState() => _HelpScreenState();
+}
+
+class _HelpScreenState extends State<HelpScreen> {
+  final List<Map<String, String>> _helpItems = [
+    {'title': '이미지 검색', 'description': 'Pixabay에서 이미지를 검색하세요.'},
+    {'title': '갤러리', 'description': '저장된 이미지를 확인하세요.'},
+    {'title': '설정', 'description': '앱 설정을 변경하세요.'},
+    {'title': '내 프로필', 'description': '프로필 정보를 관리하세요.'},
+    {'title': '알림', 'description': '최신 알림을 확인하세요.'},
+    {'title': '도움말', 'description': '앱 사용에 필요한 정보를 확인하세요.'},
+  ];
+
+  String _searchQuery = '';
 
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    final filteredItems = _helpItems
+        .where((item) =>
+    item['title']!.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+        item['description']!
+            .toLowerCase()
+            .contains(_searchQuery.toLowerCase()))
+        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -25,11 +49,9 @@ class HelpScreen extends StatelessWidget {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: isDarkMode
-              ? Colors.black // 다크 모드: 검은색 배경
-              : null, // 라이트 모드: 기본 배경 (그라데이션 포함)
+          color: isDarkMode ? Colors.black : null,
           gradient: isDarkMode
-              ? null // 다크 모드에서는 그라데이션 제거
+              ? null
               : const LinearGradient(
             colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
@@ -39,50 +61,122 @@ class HelpScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '앱 도움말',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+              // 검색 입력 필드
+              TextField(
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: '도움말 검색',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  filled: true,
+                  fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
                 ),
               ),
               const SizedBox(height: 16),
+              // 도움말 목록
               Expanded(
-                child: SingleChildScrollView(
+                child: filteredItems.isEmpty
+                    ? Center(
                   child: Text(
-                    '''
-1. 이미지 검색
- - Pixabay를 통해 원하는 이미지를 검색할 수 있습니다.
- - 검색창에 키워드를 입력하고 다양한 이미지를 탐색해보세요.
-
-2. 갤러리
- - 저장된 이미지를 갤러리에서 확인하세요.
- - 이미지를 삭제하거나 다른 작업을 수행할 수 있습니다.
-
-3. 설정
- - 앱 테마, 알림 설정 등 다양한 옵션을 조정할 수 있습니다.
-
-4. 내 프로필
- - 프로필 사진을 업로드하고 사용자 정보를 관리하세요.
-
-5. 알림
- - 앱에서 제공하는 최신 소식을 받아보세요.
-
-6. 도움말
- - 앱 사용에 필요한 정보를 이 화면에서 확인하세요.
-
-궁금한 점이나 문제가 발생하면 언제든지 문의하세요. 즐거운 시간 보내세요!
-                    ''',
+                    '검색 결과가 없습니다.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDarkMode ? Colors.white70 : Colors.black87,
-                      height: 1.5,
+                      color: isDarkMode ? Colors.white70 : Colors.black54,
                     ),
                   ),
+                )
+                    : ListView.builder(
+                  itemCount: filteredItems.length,
+                  itemBuilder: (context, index) {
+                    final item = filteredItems[index];
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      color:
+                      isDarkMode ? Colors.grey[800] : Colors.white,
+                      elevation: 4,
+                      child: ListTile(
+                        leading: Icon(
+                          Icons.help_outline,
+                          color: isDarkMode
+                              ? Colors.tealAccent
+                              : Colors.cyan,
+                        ),
+                        title: Text(
+                          item['title']!,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode
+                                ? Colors.white
+                                : Colors.black87,
+                          ),
+                        ),
+                        subtitle: Text(
+                          item['description']!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode
+                                ? Colors.white70
+                                : Colors.black54,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
+              ),
+              const SizedBox(height: 16),
+              // 문의 및 FAQ 버튼
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('문의하기 화면으로 이동합니다.')),
+                      );
+                    },
+                    icon: const Icon(Icons.mail_outline),
+                    label: const Text('문의하기'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                      isDarkMode ? Colors.tealAccent : Colors.cyan,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      context.push('/FAQScreen');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('FAQ 화면으로 이동합니다.')),
+                      );
+                    },
+                    icon: const Icon(Icons.info_outline),
+                    label: const Text('FAQ'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                      isDarkMode ? Colors.tealAccent : Colors.cyan,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
