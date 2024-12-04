@@ -141,6 +141,7 @@ class _HelpScreenState extends State<HelpScreen> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
+                      context.push('/contact');
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('문의하기 화면으로 이동합니다.')),
                       );
