@@ -4,6 +4,7 @@ import 'package:image_search_app/domain/model/pixabay_item.dart';
 import 'package:image_search_app/presentation/FAQ/faq_screen.dart';
 import 'package:image_search_app/presentation/alarm/alaram_screen.dart';
 import 'package:image_search_app/presentation/component/gallery/gallery_screen.dart';
+import 'package:image_search_app/presentation/contactus/contact_us_screen.dart';
 import 'package:image_search_app/presentation/help/help_screen.dart';
 import 'package:image_search_app/presentation/home/home_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_screen.dart';
@@ -58,6 +59,10 @@ final router = GoRouter(
     GoRoute(
       path: '/FAQScreen',
       builder: (context, state) => const FAQScreen(),
+    ),
+    GoRoute(
+      path: '/contact',
+      builder: (context, state) => const ContactUsScreen(),
     ),
     GoRoute(
       path: '/hero',
