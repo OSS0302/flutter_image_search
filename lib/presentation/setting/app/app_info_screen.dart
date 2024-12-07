@@ -38,12 +38,13 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       appBar: AppBar(
         title: const Text('앱 정보'),
         backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
+        elevation: 2,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: isDarkMode
               ? LinearGradient(
-            colors: [Colors.black, Colors.grey[900]!],
+            colors: [Colors.black, Colors.grey[850]!],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           )
@@ -53,11 +54,13 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
             end: Alignment.bottomCenter,
           ),
         ),
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              _buildHeader(isDarkMode),
+              const SizedBox(height: 24),
               _buildInfoTile('앱 이름', _appName, isDarkMode),
               const SizedBox(height: 16),
               _buildInfoTile('패키지 이름', _packageName, isDarkMode),
@@ -76,16 +79,10 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
                   );
                 },
               ),
-              const Spacer(),
-              Center(
-                child: Text(
-                  '© 2024 My App. All rights reserved.',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: isDarkMode ? Colors.white70 : Colors.black54,
-                  ),
-                ),
-              ),
+              const SizedBox(height: 32),
+              _buildSectionDivider(isDarkMode),
+              const SizedBox(height: 16),
+              _buildFooter(isDarkMode),
             ],
           ),
         ),
@@ -93,9 +90,54 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     );
   }
 
+  Widget _buildHeader(bool isDarkMode) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 40,
+          backgroundColor: isDarkMode ? Colors.grey[800] : Colors.teal[100],
+          child: Icon(
+            Icons.info,
+            size: 40,
+            color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '앱 정보',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '앱에 대한 세부 정보 및 버전 정보를 확인하세요.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDarkMode ? Colors.white70 : Colors.black54,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildInfoTile(String title, String value, bool isDarkMode,
       {VoidCallback? onTap}) {
     return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      tileColor: isDarkMode ? Colors.grey[800] : Colors.white,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       title: Text(
         title,
         style: TextStyle(
@@ -116,6 +158,49 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       )
           : null,
       onTap: onTap,
+    );
+  }
+
+  Widget _buildSectionDivider(bool isDarkMode) {
+    return Row(
+      children: [
+        Expanded(
+          child: Divider(
+            thickness: 1,
+            color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Text(
+            '추가 정보',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Divider(
+            thickness: 1,
+            color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFooter(bool isDarkMode) {
+    return Center(
+      child: Text(
+        '© 2024 My App. All rights reserved.\nDeveloped by My Team.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14,
+          color: isDarkMode ? Colors.white70 : Colors.black54,
+        ),
+      ),
     );
   }
 }
