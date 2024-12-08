@@ -43,13 +43,13 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       body: Container(
         decoration: BoxDecoration(
           gradient: isDarkMode
-              ? LinearGradient(
-            colors: [Colors.black, Colors.grey[850]!],
+              ? const LinearGradient(
+            colors: [Colors.black, Colors.grey],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           )
-              : LinearGradient(
-            colors: [Colors.white, Colors.teal[50]!],
+              : const LinearGradient(
+            colors: [Colors.white, Colors.teal],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -95,11 +95,11 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
       children: [
         CircleAvatar(
           radius: 40,
-          backgroundColor: isDarkMode ? Colors.grey[800] : Colors.teal[100],
+          backgroundColor: isDarkMode ? Colors.teal[700] : Colors.teal[100],
           child: Icon(
             Icons.info,
             size: 40,
-            color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+            color: isDarkMode ? Colors.white : Colors.teal,
           ),
         ),
         const SizedBox(width: 16),
@@ -112,12 +112,12 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: isDarkMode ? Colors.white : Colors.black87,
+                  color: isDarkMode ? Colors.tealAccent : Colors.cyan,
                 ),
               ),
               const SizedBox(height: 4),
               Text(
-                '앱에 대한 세부 정보 및 버전 정보를 확인하세요.',
+                '앱에 대한 세부 정보 및 라이선스를 확인하세요.',
                 style: TextStyle(
                   fontSize: 16,
                   color: isDarkMode ? Colors.white70 : Colors.black54,
@@ -132,32 +132,35 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
 
   Widget _buildInfoTile(String title, String value, bool isDarkMode,
       {VoidCallback? onTap}) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      tileColor: isDarkMode ? Colors.grey[800] : Colors.white,
+    return Card(
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      title: Text(
-        title,
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
+      color: isDarkMode ? Colors.grey[800] : Colors.white,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+          ),
+        ),
+        subtitle: Text(
+          value.isEmpty ? '정보를 가져오는 중...' : value,
+          style: TextStyle(
+            color: isDarkMode ? Colors.white70 : Colors.black87,
+          ),
+        ),
+        trailing: onTap != null
+            ? Icon(
+          Icons.arrow_forward_ios,
           color: isDarkMode ? Colors.tealAccent : Colors.cyan,
-        ),
+        )
+            : null,
+        onTap: onTap,
       ),
-      subtitle: Text(
-        value.isEmpty ? '정보를 가져오는 중...' : value,
-        style: TextStyle(
-          color: isDarkMode ? Colors.white70 : Colors.black87,
-        ),
-      ),
-      trailing: onTap != null
-          ? Icon(
-        Icons.arrow_forward_ios,
-        color: isDarkMode ? Colors.white70 : Colors.black54,
-      )
-          : null,
-      onTap: onTap,
     );
   }
 
@@ -167,7 +170,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         Expanded(
           child: Divider(
             thickness: 1,
-            color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+            color: isDarkMode ? Colors.tealAccent : Colors.teal,
           ),
         ),
         Padding(
@@ -184,7 +187,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         Expanded(
           child: Divider(
             thickness: 1,
-            color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+            color: isDarkMode ? Colors.tealAccent : Colors.teal,
           ),
         ),
       ],
