@@ -96,7 +96,9 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.info,
                 title: '앱 정보',
                 subtitle: '버전 정보 및 라이선스',
-                onTap: () {},
+                onTap: () {
+                  context.push('/appInfo');
+                },
               ),
             ],
           ),
