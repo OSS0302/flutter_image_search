@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
+import 'package:http/http.dart' as http;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -31,6 +33,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _profileImage = File(pickedFile.path);
       }
     });
+  }
+
+  Future<Uint8List?> _fetchImage(String url) async {
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      }
+    } catch (e) {
+      debugPrint("Error fetching image: $e");
+    }
+    return null;
   }
 
   void _removeProfileImage() {
@@ -83,12 +97,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   labelText: '이름',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return '이름을 입력하세요.';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -98,14 +106,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.emailAddress,
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return '이메일을 입력하세요.';
-                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return '유효한 이메일 형식을 입력하세요.';
-                  }
-                  return null;
-                },
               ),
             ],
           ),
@@ -176,17 +176,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Stack(
                   alignment: Alignment.bottomRight,
                   children: [
-                    CircleAvatar(
-                      radius: 60,
-                      backgroundImage: _profileImage != null
-                          ? FileImage(_profileImage!) as ImageProvider
-                          : const NetworkImage(
-                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFQcO-4Xn3BmOajGASg21cqBAAQvPz7zYpw&s'),
-                      child: _isLoading
-                          ? const CircularProgressIndicator(
-                        color: Colors.white,
-                      )
-                          : null,
+                    FutureBuilder<Uint8List?>(
+                      future: _fetchImage(
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0mpEAFXv-iIa50q5rA2L6nnHGy_akXDFyQQ&s'),
+                      builder: (context, snapshot) {
+                        if (_profileImage != null) {
+                          return CircleAvatar(
+                            radius: 60,
+                            backgroundImage: FileImage(_profileImage!),
+                          );
+                        } else if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircleAvatar(
+                            radius: 60,
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError || !snapshot.hasData) {
+                          return const CircleAvatar(
+                            radius: 60,
+                            child: Icon(Icons.error),
+                          );
+                        } else {
+                          return CircleAvatar(
+                            radius: 60,
+                            backgroundImage: MemoryImage(snapshot.data!),
+                          );
+                        }
+                      },
                     ),
                     Positioned(
                       bottom: 0,
@@ -280,6 +296,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-
-
