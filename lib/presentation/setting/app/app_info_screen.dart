@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/services.dart';
 
@@ -47,6 +48,16 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
           title: const Text('앱 정보'),
           backgroundColor: _isDarkMode ? Colors.grey[900] : Colors.cyan,
           elevation: 2,
+          leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Colors.white),
+        onPressed: () {
+          if (Navigator.canPop(context)) {
+            context.pop(context);
+          } else {
+            context.go('/ProfileScreen');
+          }
+        },
+      ),
           actions: [
             IconButton(
               icon: Icon(
