@@ -67,7 +67,9 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.lock,
                 title: '보안 설정',
                 subtitle: '비밀번호 및 2단계 인증 관리',
-                onTap: () {},
+                onTap: () {
+                  context.push('/pwScreen');
+                },
               ),
               const SizedBox(height: 16),
               _buildSettingsTile(

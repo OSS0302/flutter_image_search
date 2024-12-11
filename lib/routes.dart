@@ -12,6 +12,7 @@ import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/presentation/profile/add/additional_info_screen.dart';
 import 'package:image_search_app/presentation/profile/profile_screen.dart';
 import 'package:image_search_app/presentation/setting/app/app_info_screen.dart';
+import 'package:image_search_app/presentation/setting/pw/security_settings_screen.dart';
 import 'package:image_search_app/presentation/setting/setting_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:image_search_app/presentation/hero/hero_screen.dart';
@@ -68,6 +69,10 @@ final router = GoRouter(
     GoRoute(
       path: '/appInfo',
       builder: (context, state) => const AppInfoScreen(),
+    ),
+    GoRoute(
+      path: '/pwScreen',
+      builder: (context, state) => const SecuritySettingsScreen(),
     ),
     GoRoute(
       path: '/hero',
