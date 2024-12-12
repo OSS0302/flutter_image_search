@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class SecuritySettingsScreen extends StatefulWidget {
   const SecuritySettingsScreen({super.key});
@@ -28,10 +29,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
             TextButton(
               onPressed: () {
                 // 비밀번호 변경 처리
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
-                );
+                Navigator.pop(context); // 예시: 처리 후 다이얼로그 닫기
               },
               child: const Text('확인'),
             ),
@@ -47,9 +45,8 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_isTwoFactorEnabled
-            ? '2단계 인증이 활성화되었습니다.'
-            : '2단계 인증이 비활성화되었습니다.'),
+        content: Text(
+            _isTwoFactorEnabled ? '2단계 인증이 활성화되었습니다.' : '2단계 인증이 비활성화되었습니다.'),
       ),
     );
   }
@@ -70,13 +67,15 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           children: [
             _buildHeader(isDarkMode),
             const SizedBox(height: 24),
+            // 비밀번호 변경 카드
             Card(
               elevation: 3,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ListTile(
-                leading: Icon(Icons.lock, color: isDarkMode ? Colors.tealAccent : Colors.cyan),
+                leading: Icon(Icons.lock,
+                    color: isDarkMode ? Colors.tealAccent : Colors.cyan),
                 title: const Text('비밀번호 변경'),
                 subtitle: const Text('현재 비밀번호를 변경합니다.'),
                 trailing: Icon(Icons.arrow_forward_ios,
@@ -85,6 +84,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
               ),
             ),
             const SizedBox(height: 16),
+            // 2단계 인증 스위치 카드
             Card(
               elevation: 3,
               shape: RoundedRectangleBorder(
@@ -93,9 +93,29 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
               child: SwitchListTile(
                 value: _isTwoFactorEnabled,
                 onChanged: _toggleTwoFactorAuth,
-                secondary: Icon(Icons.security, color: isDarkMode ? Colors.tealAccent : Colors.cyan),
+                secondary: Icon(Icons.security,
+                    color: isDarkMode ? Colors.tealAccent : Colors.cyan),
                 title: const Text('2단계 인증'),
                 subtitle: const Text('계정을 더욱 안전하게 보호합니다.'),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // 2차 비밀번호 변경 카드
+            Card(
+              elevation: 3,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: ListTile(
+                leading: Icon(Icons.vpn_key,
+                    color: isDarkMode ? Colors.tealAccent : Colors.cyan),
+                title: const Text('2차 비밀번호 변경'),
+                subtitle: const Text('2단계 인증을 위한 비밀번호를 변경합니다.'),
+                trailing: Icon(Icons.arrow_forward_ios,
+                    color: isDarkMode ? Colors.tealAccent : Colors.cyan),
+                onTap: () {
+                  context.push('/change-secondary-password'); // 라우팅 처리
+                },
               ),
             ),
             const SizedBox(height: 32),
