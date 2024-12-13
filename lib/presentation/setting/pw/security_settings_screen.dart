@@ -114,7 +114,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                 trailing: Icon(Icons.arrow_forward_ios,
                     color: isDarkMode ? Colors.tealAccent : Colors.cyan),
                 onTap: () {
-                  context.push('/change-secondary-password'); // 라우팅 처리
+                  context.push('/changePw'); // 라우팅 처리
                 },
               ),
             ),
