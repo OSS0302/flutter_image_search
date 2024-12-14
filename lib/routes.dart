@@ -78,6 +78,9 @@ final router = GoRouter(
     GoRoute(
       path: '/changePw',
       builder: (context, state) => const ChangePasswordScreen(),
+    ),GoRoute(
+      path: '/changeSecondary',
+      builder: (context, state) => const ChangeSecondaryPasswordScreen(),
     ),
     GoRoute(
       path: '/hero',
