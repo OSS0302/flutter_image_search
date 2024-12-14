@@ -80,7 +80,9 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                 subtitle: const Text('현재 비밀번호를 변경합니다.'),
                 trailing: Icon(Icons.arrow_forward_ios,
                     color: isDarkMode ? Colors.tealAccent : Colors.cyan),
-                onTap: _changePassword,
+                onTap: () {
+                  context.push('/changePw');
+                },
               ),
             ),
             const SizedBox(height: 16),
@@ -114,7 +116,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                 trailing: Icon(Icons.arrow_forward_ios,
                     color: isDarkMode ? Colors.tealAccent : Colors.cyan),
                 onTap: () {
-                  context.push('/changePw'); // 라우팅 처리
+                  context.push('/changeSecondary');
                 },
               ),
             ),
