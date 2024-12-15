@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+
+import '../../../main.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({Key? key}) : super(key: key);
@@ -25,33 +26,45 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
       );
-      context.pop();
+      Navigator.pop(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // 다크모드 상태 가져오기
+    final isDarkMode = MyApp.themeNotifier.value == ThemeMode.dark;
+
+    // 배경 색상 설정
+    final backgroundColor = BoxDecoration(
+      gradient: LinearGradient(
+        colors: isDarkMode
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)] // 다크모드 색상
+            : [const Color(0xFF00BCD4), const Color(0xFF8E24AA)], // 라이트모드 색상
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+      ),
+    );
+
+    final cardColor = isDarkMode ? Colors.grey[900] : Colors.grey[100];
+    final textColor = isDarkMode ? Colors.white70 : Colors.black87;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('비밀번호 변경'),
-        backgroundColor: Colors.cyan,
+        backgroundColor: isDarkMode ? const Color(0xFF1E1E1E) : Colors.cyan,
         centerTitle: true,
         elevation: 4.0,
       ),
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF00BCD4), Color(0xFF8E24AA)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        decoration: backgroundColor,
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
               child: Card(
+                color: cardColor,
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -61,12 +74,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         '새로운 비밀번호를 입력하세요',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: textColor,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -74,13 +87,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         controller: _currentPasswordController,
                         decoration: InputDecoration(
                           labelText: '현재 비밀번호',
-                          prefixIcon: const Icon(Icons.lock, color: Colors.cyan),
+                          prefixIcon: Icon(Icons.lock, color: isDarkMode ? Colors.teal : Colors.cyan),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           filled: true,
-                          fillColor: Colors.grey[100],
+                          fillColor: cardColor,
+                          labelStyle: TextStyle(color: textColor),
                         ),
+                        style: TextStyle(color: textColor),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -94,13 +109,15 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         controller: _newPasswordController,
                         decoration: InputDecoration(
                           labelText: '새 비밀번호',
-                          prefixIcon: const Icon(Icons.lock_outline, color: Colors.cyan),
+                          prefixIcon: Icon(Icons.lock_outline, color: isDarkMode ? Colors.teal : Colors.cyan),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
                           filled: true,
-                          fillColor: Colors.grey[100],
+                          fillColor: cardColor,
+                          labelStyle: TextStyle(color: textColor),
                         ),
+                        style: TextStyle(color: textColor),
                         obscureText: true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -116,7 +133,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         child: ElevatedButton(
                           onPressed: _changePassword,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.cyan,
+                            backgroundColor: isDarkMode ? Colors.teal : Colors.cyan,
                             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(24),
@@ -124,123 +141,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                           ),
                           child: const Text(
                             '비밀번호 변경',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class ChangeSecondaryPasswordScreen extends StatefulWidget {
-  const ChangeSecondaryPasswordScreen({Key? key}) : super(key: key);
-
-  @override
-  _ChangeSecondaryPasswordScreenState createState() => _ChangeSecondaryPasswordScreenState();
-}
-
-class _ChangeSecondaryPasswordScreenState extends State<ChangeSecondaryPasswordScreen> {
-  final TextEditingController _secondaryPasswordController = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  @override
-  void dispose() {
-    _secondaryPasswordController.dispose();
-    super.dispose();
-  }
-
-  void _changeSecondaryPassword() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('2차 비밀번호가 변경되었습니다.')),
-      );
-      context.pop();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('2차 비밀번호 변경'),
-        backgroundColor: Colors.teal,
-        centerTitle: true,
-        elevation: 4.0,
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFF004D40), Color(0xFF80CBC4)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Card(
-                elevation: 8,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '새로운 2차 비밀번호를 입력하세요',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                        controller: _secondaryPasswordController,
-                        decoration: InputDecoration(
-                          labelText: '2차 비밀번호',
-                          prefixIcon: const Icon(Icons.lock, color: Colors.teal),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                        ),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return '2차 비밀번호를 입력하세요.';
-                          } else if (value.length < 6) {
-                            return '2차 비밀번호는 6자 이상이어야 합니다.';
-                          }
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 32),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: _changeSecondaryPassword,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.teal,
-                            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(24),
-                            ),
-                          ),
-                          child: const Text(
-                            '2차 비밀번호 변경',
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ),
