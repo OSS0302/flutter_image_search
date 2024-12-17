@@ -34,9 +34,57 @@ class _GalleryScreenState extends State<GalleryScreen> {
   }
 
   void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
-    });
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('이미지 삭제'),
+        content: const Text('이 이미지를 삭제하시겠습니까?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _selectedImages.removeAt(index);
+              });
+              Navigator.pop(context);
+            },
+            child: const Text(
+              '삭제',
+              style: TextStyle(color: Colors.redAccent),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _uploadImages() {
+    // 여기에 업로드 로직을 추가하세요.
+    print('이미지 업로드: ${_selectedImages.length}개');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('이미지를 업로드했습니다!')),
+    );
+  }
+
+  void _showFullImage(File image) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          backgroundColor: Colors.black,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            iconTheme: const IconThemeData(color: Colors.white),
+          ),
+          body: Center(
+            child: Image.file(image),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -46,38 +94,35 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('갤러리'),
-        backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
+        backgroundColor: isDarkMode ? Colors.black87 : Colors.cyan,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            } else {
-              context.go('/');
-            }
-          },
+          onPressed: () => context.go('/'),
         ),
+        actions: [
+          if (_selectedImages.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.cloud_upload),
+              onPressed: _uploadImages,
+              tooltip: '이미지 업로드',
+            ),
+        ],
       ),
       body: Container(
         decoration: BoxDecoration(
-          gradient: isDarkMode
-              ? LinearGradient(
-            colors: [Colors.black, Colors.grey[800]!],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          )
-              : LinearGradient(
-            colors: [Colors.white, Colors.teal[50]!],
+          gradient: LinearGradient(
+            colors: isDarkMode
+                ? [Colors.black, Colors.grey[900]!]
+                : [Colors.white, Colors.teal[50]!],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 헤더: 이미지 수 표시 및 추가 버튼
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.all(16.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -97,13 +142,12 @@ class _GalleryScreenState extends State<GalleryScreen> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            // 이미지 그리드 또는 Empty State
             Expanded(
               child: _selectedImages.isEmpty
                   ? Center(
@@ -111,16 +155,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      Icons.photo_library,
-                      size: 80,
-                      color: isDarkMode ? Colors.white54 : Colors.grey,
+                      Icons.photo_library_outlined,
+                      size: 100,
+                      color: isDarkMode ? Colors.white30 : Colors.grey[400],
                     ),
                     const SizedBox(height: 16),
                     Text(
                       '이미지를 선택해주세요.',
                       style: TextStyle(
                         fontSize: 18,
-                        color: isDarkMode ? Colors.white70 : Colors.grey,
+                        color: isDarkMode ? Colors.white70 : Colors.grey[600],
                       ),
                     ),
                   ],
@@ -135,50 +179,53 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
                 itemCount: _selectedImages.length,
                 itemBuilder: (context, index) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 6,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.file(
-                            _selectedImages[index],
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
+                  return GestureDetector(
+                    onTap: () => _showFullImage(_selectedImages[index]),
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 6,
+                                offset: Offset(0, 3),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -8,
-                        right: -8,
-                        child: GestureDetector(
-                          onTap: () => _removeImage(index),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.redAccent,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              color: Colors.white,
-                              size: 20,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              _selectedImages[index],
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                        Positioned(
+                          top: -8,
+                          right: -8,
+                          child: GestureDetector(
+                            onTap: () => _removeImage(index),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.redAccent,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   );
                 },
               ),
