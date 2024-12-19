@@ -11,6 +11,7 @@ import 'package:image_search_app/presentation/pixabay/pixabay_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/presentation/profile/add/additional_info_screen.dart';
 import 'package:image_search_app/presentation/profile/profile_screen.dart';
+import 'package:image_search_app/presentation/setting/account/account_settings_screen.dart';
 import 'package:image_search_app/presentation/setting/app/app_info_screen.dart';
 import 'package:image_search_app/presentation/setting/pw/change_password_screen.dart';
 import 'package:image_search_app/presentation/setting/pw/change_secondary_password_screen.dart';
@@ -82,6 +83,10 @@ final router = GoRouter(
     ),GoRoute(
       path: '/changeSecondary',
       builder: (context, state) => const ChangeSecondaryPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/accountSetting',
+      builder: (context, state) => const AccountSettingsScreen(),
     ),
     GoRoute(
       path: '/hero',

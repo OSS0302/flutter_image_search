@@ -51,7 +51,9 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.person,
                 title: '계정 설정',
                 subtitle: '프로필 정보 수정',
-                onTap: () {},
+                onTap: () {
+                  context.push('/accountSetting');
+                },
               ),
               const SizedBox(height: 16),
               _buildSettingsTile(
