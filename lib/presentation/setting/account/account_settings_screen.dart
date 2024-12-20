@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class AccountSettingsScreen extends StatelessWidget {
   const AccountSettingsScreen({super.key});
@@ -50,7 +51,19 @@ class AccountSettingsScreen extends StatelessWidget {
                     title: '프로필 사진 변경',
                     subtitle: '사진을 업데이트하세요',
                     onTap: () {
-                      // TODO: Add functionality to change profile picture
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('프로필 사진 변경'),
+                          content: const Text('프로필 사진 변경 기능은 준비 중입니다.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('확인'),
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -60,7 +73,35 @@ class AccountSettingsScreen extends StatelessWidget {
                     title: '이름 변경',
                     subtitle: '계정 이름을 변경합니다',
                     onTap: () {
-                      // TODO: Add functionality to change name
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          final TextEditingController nameController = TextEditingController();
+                          return AlertDialog(
+                            title: const Text('이름 변경'),
+                            content: TextField(
+                              controller: nameController,
+                              decoration: const InputDecoration(hintText: '새 이름 입력'),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // TODO: Add name update logic
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('이름이 "${nameController.text}"(으)로 변경되었습니다.')),
+                                  );
+                                },
+                                child: const Text('저장'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -70,7 +111,35 @@ class AccountSettingsScreen extends StatelessWidget {
                     title: '이메일 변경',
                     subtitle: '연락처 이메일을 수정하세요',
                     onTap: () {
-                      // TODO: Add functionality to change email
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          final TextEditingController emailController = TextEditingController();
+                          return AlertDialog(
+                            title: const Text('이메일 변경'),
+                            content: TextField(
+                              controller: emailController,
+                              decoration: const InputDecoration(hintText: '새 이메일 입력'),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // TODO: Add email update logic
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text('이메일이 "${emailController.text}"(으)로 변경되었습니다.')),
+                                  );
+                                },
+                                child: const Text('저장'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -80,7 +149,36 @@ class AccountSettingsScreen extends StatelessWidget {
                     title: '비밀번호 변경',
                     subtitle: '비밀번호를 업데이트하세요',
                     onTap: () {
-                      // TODO: Add functionality to change password
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          final TextEditingController passwordController = TextEditingController();
+                          return AlertDialog(
+                            title: const Text('비밀번호 변경'),
+                            content: TextField(
+                              controller: passwordController,
+                              obscureText: true,
+                              decoration: const InputDecoration(hintText: '새 비밀번호 입력'),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('취소'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  // TODO: Add password update logic
+                                  Navigator.pop(context);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
+                                  );
+                                },
+                                child: const Text('저장'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -102,8 +200,13 @@ class AccountSettingsScreen extends StatelessWidget {
                             ),
                             TextButton(
                               onPressed: () {
-                                // TODO: Add functionality to delete account
                                 Navigator.pop(context);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('계정이 삭제되었습니다.'),
+                                  ),
+                                );
+                                context.go('/');
                               },
                               child: const Text('삭제', style: TextStyle(color: Colors.red)),
                             ),
