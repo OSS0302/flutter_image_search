@@ -79,7 +79,9 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.language,
                 title: '언어 설정',
                 subtitle: '앱 언어 변경',
-                onTap: () {},
+                onTap: () {
+                  context.push('/language');
+                },
               ),
               const SizedBox(height: 16),
               _buildSettingsTile(

@@ -7,6 +7,7 @@ import 'package:image_search_app/presentation/component/gallery/gallery_screen.d
 import 'package:image_search_app/presentation/contactus/contact_us_screen.dart';
 import 'package:image_search_app/presentation/help/help_screen.dart';
 import 'package:image_search_app/presentation/home/home_screen.dart';
+import 'package:image_search_app/presentation/language/language_settings_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_screen.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:image_search_app/presentation/profile/add/additional_info_screen.dart';
@@ -83,6 +84,10 @@ final router = GoRouter(
     ),GoRoute(
       path: '/changeSecondary',
       builder: (context, state) => const ChangeSecondaryPasswordScreen(),
+    ),
+    GoRoute(
+      path: '/language',
+      builder: (context, state) => const LanguageSettingsScreen(),
     ),
     GoRoute(
       path: '/accountSetting',
