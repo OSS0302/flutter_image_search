@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_search_app/domain/model/pixabay_item.dart';
 import 'package:image_search_app/presentation/FAQ/faq_screen.dart';
 import 'package:image_search_app/presentation/alarm/alaram_screen.dart';
+import 'package:image_search_app/presentation/alarm/notification_settings_screen.dart';
 import 'package:image_search_app/presentation/component/gallery/gallery_screen.dart';
 import 'package:image_search_app/presentation/contactus/contact_us_screen.dart';
 import 'package:image_search_app/presentation/help/help_screen.dart';
@@ -88,6 +89,10 @@ final router = GoRouter(
     GoRoute(
       path: '/language',
       builder: (context, state) => const LanguageSettingsScreen(),
+    ),
+    GoRoute(
+      path: '/notification',
+      builder: (context, state) => const NotificationSettingsScreen(),
     ),
     GoRoute(
       path: '/accountSetting',

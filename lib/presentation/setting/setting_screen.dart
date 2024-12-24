@@ -61,7 +61,9 @@ class SettingsScreen extends StatelessWidget {
                 icon: Icons.notifications,
                 title: '알림 설정',
                 subtitle: '푸시 알림 및 알림 사운드 관리',
-                onTap: () {},
+                onTap: () {
+                  context.push('/notification');
+                },
               ),
               const SizedBox(height: 16),
               _buildSettingsTile(
