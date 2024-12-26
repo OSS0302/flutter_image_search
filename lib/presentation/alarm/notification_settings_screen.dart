@@ -14,6 +14,12 @@ class _NotificationSettingsScreenState
   bool _isSoundEnabled = true;
   bool _isVibrationEnabled = false;
   TimeOfDay _notificationTime = const TimeOfDay(hour: 9, minute: 0);
+  double _notificationPriority = 3.0; // 1~5 중요도
+  final Map<String, bool> _notificationCategories = {
+    "일반 알림": true,
+    "소셜 알림": false,
+    "마케팅 알림": false,
+  };
 
   void _toggleNotifications(bool value) {
     setState(() {
@@ -30,6 +36,12 @@ class _NotificationSettingsScreenState
   void _toggleVibration(bool value) {
     setState(() {
       _isVibrationEnabled = value;
+    });
+  }
+
+  void _toggleCategory(String category, bool value) {
+    setState(() {
+      _notificationCategories[category] = value;
     });
   }
 
@@ -121,6 +133,10 @@ class _NotificationSettingsScreenState
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  const SizedBox(height: 16),
+                  _buildPrioritySlider(),
+                  const SizedBox(height: 16),
+                  _buildCategorySelector(),
                 ],
               ),
             ),
@@ -131,11 +147,10 @@ class _NotificationSettingsScreenState
   }
 
   Widget _buildSummaryCard() {
-    final activeCount = [
-      _isNotificationsEnabled,
-      _isSoundEnabled && _isNotificationsEnabled,
-      _isVibrationEnabled && _isNotificationsEnabled
-    ].where((setting) => setting).length;
+    final activeCategories = _notificationCategories.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
 
     return Card(
       elevation: 4,
@@ -156,23 +171,74 @@ class _NotificationSettingsScreenState
             ),
             const SizedBox(height: 8),
             Text(
-              '활성화된 옵션: $activeCount개',
+              '활성화된 알림: ${activeCategories.join(', ')}',
               style: TextStyle(
                 color: Colors.white70,
                 fontSize: 14,
               ),
             ),
-            if (_isNotificationsEnabled)
-              Text(
-                '알림 시간: ${_notificationTime.format(context)}',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 14,
-                ),
+            Text(
+              '알림 중요도: ${_notificationPriority.toStringAsFixed(1)}/5',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
               ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPrioritySlider() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '알림 중요도 설정',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Slider(
+          value: _notificationPriority,
+          min: 1,
+          max: 5,
+          divisions: 4,
+          label: _notificationPriority.toStringAsFixed(1),
+          onChanged: _isNotificationsEnabled
+              ? (value) {
+            setState(() {
+              _notificationPriority = value;
+            });
+          }
+              : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCategorySelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '알림 카테고리 설정',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        ..._notificationCategories.keys.map((category) {
+          return CheckboxListTile(
+            title: Text(category),
+            value: _notificationCategories[category],
+            onChanged: _isNotificationsEnabled
+                ? (value) {
+              if (value != null) {
+                _toggleCategory(category, value);
+              }
+            }
+                : null,
+          );
+        }).toList(),
+      ],
     );
   }
 
