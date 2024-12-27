@@ -19,6 +19,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _userName = "사용자 이름";
   String _userEmail = "user@example.com";
+  bool _isNotificationEnabled = true;
 
   Future<void> _pickImageFromGallery() async {
     setState(() {
@@ -130,6 +131,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       },
     );
+  }
+
+  void _logoutUser() {
+    // 로그아웃 동작 구현
+    debugPrint("User logged out.");
   }
 
   @override
@@ -287,6 +293,82 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   onTap: () {
                     context.push('/additional-info');
                   },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.notifications_active,
+                    color: Colors.cyan,
+                  ),
+                  title: const Text('알림 설정'),
+                  trailing: Switch(
+                    value: _isNotificationEnabled,
+                    onChanged: (value) {
+                      setState(() {
+                        _isNotificationEnabled = value;
+                      });
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.language,
+                    color: Colors.cyan,
+                  ),
+                  title: const Text('언어 설정'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {
+                    context.push('/language-settings');
+                  },
+                ),
+              ),
+              const SizedBox(height: 16),
+              Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 4,
+                child: ExpansionTile(
+                  leading: const Icon(
+                    Icons.history,
+                    color: Colors.cyan,
+                  ),
+                  title: const Text('활동 기록'),
+                  children: [
+                    ListTile(
+                      title: const Text('로그인 - 2024-12-20'),
+                      subtitle: const Text('성공적으로 로그인하였습니다.'),
+                    ),
+                    ListTile(
+                      title: const Text('비밀번호 변경 - 2024-12-18'),
+                      subtitle: const Text('비밀번호가 성공적으로 변경되었습니다.'),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: _logoutUser,
+                icon: const Icon(Icons.logout),
+                label: const Text('로그아웃'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ],
