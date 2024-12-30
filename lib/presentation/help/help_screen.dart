@@ -72,6 +72,16 @@ class _HelpScreenState extends State<HelpScreen> {
                 decoration: InputDecoration(
                   hintText: '도움말 검색',
                   prefixIcon: const Icon(Icons.search),
+                  suffixIcon: _searchQuery.isNotEmpty
+                      ? IconButton(
+                    icon: const Icon(Icons.clear),
+                    onPressed: () {
+                      setState(() {
+                        _searchQuery = '';
+                      });
+                    },
+                  )
+                      : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -88,7 +98,8 @@ class _HelpScreenState extends State<HelpScreen> {
                     '검색 결과가 없습니다.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: isDarkMode ? Colors.white70 : Colors.black54,
+                      color:
+                      isDarkMode ? Colors.white70 : Colors.black54,
                     ),
                   ),
                 )
@@ -96,37 +107,41 @@ class _HelpScreenState extends State<HelpScreen> {
                   itemCount: filteredItems.length,
                   itemBuilder: (context, index) {
                     final item = filteredItems[index];
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      color:
-                      isDarkMode ? Colors.grey[800] : Colors.white,
-                      elevation: 4,
-                      child: ListTile(
-                        leading: Icon(
-                          Icons.help_outline,
-                          color: isDarkMode
-                              ? Colors.tealAccent
-                              : Colors.cyan,
+                    return GestureDetector(
+                      onTap: () => _showHelpDetail(item),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        title: Text(
-                          item['title']!,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        color: isDarkMode
+                            ? Colors.grey[800]
+                            : Colors.white,
+                        elevation: 4,
+                        child: ListTile(
+                          leading: Icon(
+                            Icons.help_outline,
                             color: isDarkMode
-                                ? Colors.white
-                                : Colors.black87,
+                                ? Colors.tealAccent
+                                : Colors.cyan,
                           ),
-                        ),
-                        subtitle: Text(
-                          item['description']!,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode
-                                ? Colors.white70
-                                : Colors.black54,
+                          title: Text(
+                            item['title']!,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode
+                                  ? Colors.white
+                                  : Colors.black87,
+                            ),
+                          ),
+                          subtitle: Text(
+                            item['description']!,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isDarkMode
+                                  ? Colors.white70
+                                  : Colors.black54,
+                            ),
                           ),
                         ),
                       ),
@@ -142,9 +157,6 @@ class _HelpScreenState extends State<HelpScreen> {
                   ElevatedButton.icon(
                     onPressed: () {
                       context.push('/contact');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('문의하기 화면으로 이동합니다.')),
-                      );
                     },
                     icon: const Icon(Icons.mail_outline),
                     label: const Text('문의하기'),
@@ -161,9 +173,6 @@ class _HelpScreenState extends State<HelpScreen> {
                   ElevatedButton.icon(
                     onPressed: () {
                       context.push('/FAQScreen');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('FAQ 화면으로 이동합니다.')),
-                      );
                     },
                     icon: const Icon(Icons.info_outline),
                     label: const Text('FAQ'),
@@ -183,6 +192,24 @@ class _HelpScreenState extends State<HelpScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showHelpDetail(Map<String, String> item) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(item['title']!),
+          content: Text(item['description']!),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('닫기'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
