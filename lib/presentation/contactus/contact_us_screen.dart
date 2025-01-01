@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io'; // For File
+import 'package:image_picker/image_picker.dart'; // For file picker
 
 class ContactUsScreen extends StatefulWidget {
   const ContactUsScreen({super.key});
@@ -12,8 +14,10 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
+
+  File? _selectedFile;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -24,24 +28,53 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     super.dispose();
   }
 
-  void _submitFeedback() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            '문의가 성공적으로 전송되었습니다. 감사합니다!',
-            style: TextStyle(fontSize: 16),
-          ),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+  Future<void> _pickFile() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-      // 모든 입력 필드 초기화
-      _nameController.clear();
-      _emailController.clear();
-      _subjectController.clear();
-      _messageController.clear();
+    if (pickedFile != null) {
+      setState(() {
+        _selectedFile = File(pickedFile.path);
+      });
     }
+  }
+
+  void _submitFeedback() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    // Simulate submission delay
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      _isSubmitting = false;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          '문의가 성공적으로 전송되었습니다. 감사합니다!',
+          style: TextStyle(fontSize: 16),
+        ),
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: '확인',
+          onPressed: () {},
+        ),
+      ),
+    );
+
+    _formKey.currentState!.reset();
+    _nameController.clear();
+    _emailController.clear();
+    _subjectController.clear();
+    _messageController.clear();
+    setState(() {
+      _selectedFile = null;
+    });
   }
 
   @override
@@ -52,7 +85,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       appBar: AppBar(
         title: const Text('문의하기'),
         backgroundColor: isDarkMode ? Colors.grey[900] : Colors.cyan,
-        elevation: 2,
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -69,7 +101,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           ),
         ),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
@@ -88,12 +120,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   label: '이름',
                   hintText: '이름을 입력하세요',
                   isDarkMode: isDarkMode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '이름을 입력해주세요.';
-                    }
-                    return null;
-                  },
+                  validator: (value) => value == null || value.isEmpty
+                      ? '이름을 입력해주세요.'
+                      : null,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -117,12 +146,8 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   label: '제목',
                   hintText: '문의 제목을 입력하세요',
                   isDarkMode: isDarkMode,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '문의 제목을 입력해주세요.';
-                    }
-                    return null;
-                  },
+                  validator: (value) =>
+                  value == null || value.isEmpty ? '문의 제목을 입력해주세요.' : null,
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -131,25 +156,57 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   hintText: '문의 내용을 입력하세요',
                   isDarkMode: isDarkMode,
                   maxLines: 5,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return '문의 내용을 입력해주세요.';
-                    }
-                    return null;
-                  },
+                  validator: (value) =>
+                  value == null || value.isEmpty ? '문의 내용을 입력해주세요.' : null,
+                ),
+                const SizedBox(height: 16),
+                // 첨부 파일
+                Row(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _pickFile,
+                      icon: const Icon(Icons.attach_file),
+                      label: const Text('파일 첨부'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor:
+                        isDarkMode ? Colors.tealAccent : Colors.cyan,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    if (_selectedFile != null)
+                      Expanded(
+                        child: Text(
+                          '첨부 파일: ${_selectedFile!.path.split('/').last}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 Center(
                   child: ElevatedButton.icon(
-                    onPressed: _submitFeedback,
-                    icon: const Icon(Icons.send, size: 20),
-                    label: const Text(
-                      '문의 전송',
-                      style: TextStyle(fontSize: 18),
+                    onPressed: _isSubmitting ? null : _submitFeedback,
+                    icon: _isSubmitting
+                        ? const CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    )
+                        : const Icon(Icons.send, size: 20),
+                    label: Text(
+                      _isSubmitting ? '전송 중...' : '문의 전송',
+                      style: const TextStyle(fontSize: 18),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                      isDarkMode ? Colors.tealAccent : Colors.cyan,
+                      backgroundColor: _isSubmitting
+                          ? Colors.grey
+                          : (isDarkMode ? Colors.tealAccent : Colors.cyan),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),
