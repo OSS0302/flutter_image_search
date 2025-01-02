@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
@@ -66,6 +67,16 @@ class _NotificationSettingsScreenState
         title: const Text('알림 설정'),
         centerTitle: true,
         backgroundColor: isDarkMode ? Colors.black : Colors.teal,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/');
+            }
+          },
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
