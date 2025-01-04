@@ -1,9 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'dart:io'; // For File
-import 'package:image_picker/image_picker.dart'; // For file picker
+import 'package:image_picker/image_picker.dart';
 
 class ContactUsScreen extends StatefulWidget {
-  const ContactUsScreen({super.key});
+  const ContactUsScreen({Key? key}) : super(key: key);
 
   @override
   State<ContactUsScreen> createState() => _ContactUsScreenState();
@@ -14,24 +15,24 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
 
+  final _formKey = GlobalKey<FormState>();
   File? _selectedFile;
   bool _isSubmitting = false;
+  bool _isAgreed = false;
 
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _subjectController.dispose();
-    _messageController.dispose();
-    super.dispose();
+  double _calculateProgress() {
+    int filledFields = 0;
+    if (_nameController.text.isNotEmpty) filledFields++;
+    if (_emailController.text.isNotEmpty) filledFields++;
+    if (_subjectController.text.isNotEmpty) filledFields++;
+    if (_messageController.text.isNotEmpty) filledFields++;
+    return filledFields / 4;
   }
 
   Future<void> _pickFile() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
       setState(() {
         _selectedFile = File(pickedFile.path);
@@ -40,13 +41,26 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
 
   void _submitFeedback() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate() || !_isAgreed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            '모든 필드를 작성하고 동의란에 체크해주세요.',
+            style: TextStyle(fontSize: 16),
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    bool confirmed = await _showConfirmationDialog();
+    if (!confirmed) return;
 
     setState(() {
       _isSubmitting = true;
     });
 
-    // Simulate submission delay
     await Future.delayed(const Duration(seconds: 2));
 
     setState(() {
@@ -54,16 +68,12 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text(
-          '문의가 성공적으로 전송되었습니다. 감사합니다!',
+      const SnackBar(
+        content: Text(
+          '문의가 성공적으로 전송되었습니다!',
           style: TextStyle(fontSize: 16),
         ),
         behavior: SnackBarBehavior.floating,
-        action: SnackBarAction(
-          label: '확인',
-          onPressed: () {},
-        ),
       ),
     );
 
@@ -74,7 +84,31 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     _messageController.clear();
     setState(() {
       _selectedFile = null;
+      _isAgreed = false;
     });
+  }
+
+  Future<bool> _showConfirmationDialog() async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('문의 전송 확인'),
+          content: const Text('입력하신 문의를 전송하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('취소'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('전송'),
+            ),
+          ],
+        );
+      },
+    ) ??
+        false;
   }
 
   @override
@@ -101,7 +135,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           ),
         ),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16),
           child: Form(
             key: _formKey,
             child: Column(
@@ -115,6 +149,12 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                LinearProgressIndicator(
+                  value: _calculateProgress(),
+                  backgroundColor: isDarkMode ? Colors.grey[800] : Colors.teal[100],
+                  color: isDarkMode ? Colors.tealAccent : Colors.cyan,
+                ),
+                const SizedBox(height: 16),
                 _buildTextField(
                   controller: _nameController,
                   label: '이름',
@@ -160,7 +200,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   value == null || value.isEmpty ? '문의 내용을 입력해주세요.' : null,
                 ),
                 const SizedBox(height: 16),
-                // 첨부 파일
                 Row(
                   children: [
                     ElevatedButton.icon(
@@ -168,8 +207,9 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       icon: const Icon(Icons.attach_file),
                       label: const Text('파일 첨부'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        isDarkMode ? Colors.tealAccent : Colors.cyan,
+                        backgroundColor: isDarkMode
+                            ? Colors.tealAccent
+                            : Colors.cyan,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -178,18 +218,45 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                     const SizedBox(width: 16),
                     if (_selectedFile != null)
                       Expanded(
-                        child: Text(
-                          '첨부 파일: ${_selectedFile!.path.split('/').last}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDarkMode ? Colors.white70 : Colors.black54,
+                        child: Card(
+                          elevation: 2,
+                          color: isDarkMode ? Colors.grey[800] : Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              _selectedFile!.path.split('/').last,
+                              style: TextStyle(
+                                color: isDarkMode
+                                    ? Colors.white
+                                    : Colors.black87,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _isAgreed,
+                      onChanged: (value) {
+                        setState(() {
+                          _isAgreed = value ?? false;
+                        });
+                      },
+                    ),
+                    const Expanded(
+                      child: Text(
+                        '문의 전송 시 개인정보 수집에 동의합니다.',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 Center(
                   child: ElevatedButton.icon(
                     onPressed: _isSubmitting ? null : _submitFeedback,
@@ -198,7 +265,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       color: Colors.white,
                       strokeWidth: 2,
                     )
-                        : const Icon(Icons.send, size: 20),
+                        : const Icon(Icons.send),
                     label: Text(
                       _isSubmitting ? '전송 중...' : '문의 전송',
                       style: const TextStyle(fontSize: 18),
@@ -209,10 +276,6 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                           : (isDarkMode ? Colors.tealAccent : Colors.cyan),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
                       ),
                     ),
                   ),
@@ -240,22 +303,11 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
-        labelStyle: TextStyle(
-          color: isDarkMode ? Colors.tealAccent : Colors.cyan,
-        ),
-        hintStyle: TextStyle(
-          color: isDarkMode ? Colors.white70 : Colors.black45,
-        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
         ),
         filled: true,
         fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: isDarkMode ? Colors.tealAccent : Colors.cyan,
-          ),
-        ),
       ),
     );
   }
