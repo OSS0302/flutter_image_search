@@ -16,10 +16,21 @@ class _NotificationSettingsScreenState
   bool _isVibrationEnabled = false;
   TimeOfDay _notificationTime = const TimeOfDay(hour: 9, minute: 0);
   double _notificationPriority = 3.0; // 1~5 중요도
+
   final Map<String, bool> _notificationCategories = {
     "일반 알림": true,
     "소셜 알림": false,
     "마케팅 알림": false,
+  };
+
+  final Map<String, bool> _selectedDays = {
+    "월요일": true,
+    "화요일": false,
+    "수요일": true,
+    "목요일": false,
+    "금요일": true,
+    "토요일": false,
+    "일요일": false,
   };
 
   void _toggleNotifications(bool value) {
@@ -43,6 +54,12 @@ class _NotificationSettingsScreenState
   void _toggleCategory(String category, bool value) {
     setState(() {
       _notificationCategories[category] = value;
+    });
+  }
+
+  void _toggleDay(String day, bool value) {
+    setState(() {
+      _selectedDays[day] = value;
     });
   }
 
@@ -70,8 +87,8 @@ class _NotificationSettingsScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
+            if (context.canPop()) {
+              context.pop();
             } else {
               context.go('/');
             }
@@ -148,51 +165,9 @@ class _NotificationSettingsScreenState
                   _buildPrioritySlider(),
                   const SizedBox(height: 16),
                   _buildCategorySelector(),
+                  const SizedBox(height: 16),
+                  _buildDaySelector(),
                 ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryCard() {
-    final activeCategories = _notificationCategories.entries
-        .where((entry) => entry.value)
-        .map((entry) => entry.key)
-        .toList();
-
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: Colors.teal,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '알림 설정 요약',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '활성화된 알림: ${activeCategories.join(', ')}',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-              ),
-            ),
-            Text(
-              '알림 중요도: ${_notificationPriority.toStringAsFixed(1)}/5',
-              style: TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
               ),
             ),
           ],
@@ -253,6 +228,55 @@ class _NotificationSettingsScreenState
     );
   }
 
+  Widget _buildDaySelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          '알림 요일 설정',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 8),
+        Wrap(
+          spacing: 8.0, // 요일 간의 간격
+          runSpacing: 8.0, // 줄 간의 간격
+          children: _selectedDays.keys.map((day) {
+            final isSelected = _selectedDays[day] ?? false;
+            return GestureDetector(
+              onTap: _isNotificationsEnabled
+                  ? () {
+                setState(() {
+                  _selectedDays[day] = !isSelected; // 선택 상태 토글
+                });
+              }
+                  : null,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? Colors.teal // 선택된 요일의 배경색
+                      : Colors.grey[300], // 선택되지 않은 요일의 배경색
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? Colors.teal : Colors.grey[400]!,
+                  ),
+                ),
+                child: Text(
+                  day,
+                  style: TextStyle(
+                    color: isSelected ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+
   Widget _buildSwitchTile({
     required String title,
     required String subtitle,
@@ -296,6 +320,55 @@ class _NotificationSettingsScreenState
           value: value,
           onChanged: enabled ? onChanged : null,
           activeColor: Colors.teal,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryCard() {
+    final activeDays = _selectedDays.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
+    final activeCategories = _notificationCategories.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: Colors.teal,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '알림 설정 요약',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '활성화된 요일: ${activeDays.join(', ')}',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '활성화된 카테고리: ${activeCategories.join(', ')}',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       ),
     );
