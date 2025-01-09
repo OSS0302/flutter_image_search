@@ -13,7 +13,7 @@ class AlarmScreen extends StatefulWidget {
 class _AlarmScreenState extends State<AlarmScreen>
     with SingleTickerProviderStateMixin {
   final List<Map<String, dynamic>> _alarms = [];
-  final TextEditingController _alarmController = TextEditingController();
+  final TextEditingController _alarmTitleController = TextEditingController();
   late TabController _tabController;
 
   @override
@@ -25,7 +25,7 @@ class _AlarmScreenState extends State<AlarmScreen>
 
   @override
   void dispose() {
-    _alarmController.dispose();
+    _alarmTitleController.dispose();
     _tabController.dispose();
     super.dispose();
   }
@@ -56,8 +56,8 @@ class _AlarmScreenState extends State<AlarmScreen>
     }
   }
 
-  void _addAlarm(TimeOfDay time, List<bool> repeatDays) {
-    if (_alarmController.text.isEmpty) {
+  void _addAlarm(TimeOfDay time, String title, List<bool> repeatDays) {
+    if (title.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('알람 제목을 입력하세요!')),
       );
@@ -65,10 +65,11 @@ class _AlarmScreenState extends State<AlarmScreen>
     }
 
     final alarmText =
-        '${time.hour}:${time.minute.toString().padLeft(2, '0')} - ${_alarmController.text}';
+        '${time.hour}:${time.minute.toString().padLeft(2, '0')} - $title';
     setState(() {
       _alarms.add({
         'text': alarmText,
+        'title': title,
         'time': {'hour': time.hour, 'minute': time.minute},
         'enabled': true,
         'repeatDays': repeatDays,
@@ -81,7 +82,7 @@ class _AlarmScreenState extends State<AlarmScreen>
       });
     });
     _saveAlarms();
-    _alarmController.clear();
+    _alarmTitleController.clear();
   }
 
   void _toggleAlarm(int index) {
@@ -106,24 +107,38 @@ class _AlarmScreenState extends State<AlarmScreen>
 
     if (picked != null) {
       final List<bool> repeatDays = List.filled(7, false); // 월~일 요일 반복 설정
-      await showDialog(
+      await await await showDialog(
         context: context,
         builder: (context) {
+          final List<bool> repeatDays = List.filled(7, false); // 요일 초기화
           return AlertDialog(
-            title: const Text('반복 요일 설정'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(7, (index) {
-                return CheckboxListTile(
-                  title: Text(['월', '화', '수', '목', '금', '토', '일'][index]),
-                  value: repeatDays[index],
-                  onChanged: (value) {
-                    setState(() {
-                      repeatDays[index] = value ?? false;
-                    });
-                  },
-                );
-              }),
+            title: const Text('알람 추가'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: _alarmTitleController,
+                    decoration: const InputDecoration(hintText: '알람 제목 입력'),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '반복 요일 설정',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  ...List.generate(7, (index) {
+                    return CheckboxListTile(
+                      title: Text(['월', '화', '수', '목', '금', '토', '일'][index]),
+                      value: repeatDays[index],
+                      onChanged: (value) {
+                        setState(() {
+                          repeatDays[index] = value ?? false;
+                        });
+                      },
+                    );
+                  }),
+                ],
+              ),
             ),
             actions: [
               TextButton(
@@ -133,7 +148,7 @@ class _AlarmScreenState extends State<AlarmScreen>
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  _addAlarm(picked, repeatDays);
+                  _addAlarm(picked, _alarmTitleController.text, repeatDays);
                 },
                 child: const Text('저장'),
               ),
@@ -161,11 +176,11 @@ class _AlarmScreenState extends State<AlarmScreen>
           color: alarm['enabled'] ? Colors.tealAccent : Colors.grey,
         ),
         title: Text(
-          '${alarm['text']} ($formattedTime)',
-          style: const TextStyle(fontSize: 16),
+          alarm['title'],
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          '남은 시간: ${_calculateTimeRemaining(alarm['time'])}',
+          '시간: $formattedTime\n남은 시간: ${_calculateTimeRemaining(alarm['time'])}',
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
@@ -214,16 +229,6 @@ class _AlarmScreenState extends State<AlarmScreen>
             Tab(text: '비활성'),
           ],
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (Navigator.of(context).canPop()) {
-              Navigator.of(context).pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
       ),
       body: TabBarView(
         controller: _tabController,
@@ -232,12 +237,16 @@ class _AlarmScreenState extends State<AlarmScreen>
           _buildAlarmList(false),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _selectTime(context),
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
   Widget _buildAlarmList(bool isActive) {
     final filteredAlarms =
-    _alarms.where((alarm) => alarm['enabled'] == isActive).toList();
+        _alarms.where((alarm) => alarm['enabled'] == isActive).toList();
 
     if (filteredAlarms.isEmpty) {
       return Center(

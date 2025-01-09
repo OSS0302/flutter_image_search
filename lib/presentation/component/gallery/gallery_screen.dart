@@ -14,6 +14,8 @@ class _GalleryScreenState extends State<GalleryScreen> {
   List<File> _selectedImages = [];
   final ImagePicker _picker = ImagePicker();
   final int _maxImages = 10;
+  bool _isMultiSelectMode = false;
+  final Set<int> _selectedForDeletion = {};
 
   Future<void> _pickImages() async {
     final List<XFile>? pickedFiles = await _picker.pickMultiImage();
@@ -33,40 +35,35 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  void _removeImage(int index) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('이미지 삭제'),
-        content: const Text('이 이미지를 삭제하시겠습니까?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedImages.removeAt(index);
-              });
-              Navigator.pop(context);
-            },
-            child: const Text(
-              '삭제',
-              style: TextStyle(color: Colors.redAccent),
-            ),
-          ),
-        ],
-      ),
+  void _removeSelectedImages() {
+    setState(() {
+      _selectedForDeletion.toList().reversed.forEach((index) {
+        _selectedImages.removeAt(index);
+      });
+      _selectedForDeletion.clear();
+      _isMultiSelectMode = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('선택된 이미지가 삭제되었습니다.')),
     );
   }
 
   void _uploadImages() {
-    // 여기에 업로드 로직을 추가하세요.
+    // 업로드 로직을 추가하세요 (예: Firebase, 서버 업로드 등)
     print('이미지 업로드: ${_selectedImages.length}개');
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('이미지를 업로드했습니다!')),
+      const SnackBar(content: Text('이미지가 업로드되었습니다!')),
     );
+  }
+
+  void _toggleMultiSelect(int index) {
+    setState(() {
+      if (_selectedForDeletion.contains(index)) {
+        _selectedForDeletion.remove(index);
+      } else {
+        _selectedForDeletion.add(index);
+      }
+    });
   }
 
   void _showFullImage(File image) {
@@ -93,14 +90,20 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('갤러리'),
+        title: Text(_isMultiSelectMode ? '이미지 선택 (${_selectedForDeletion.length})' : '갤러리'),
         backgroundColor: isDarkMode ? Colors.black87 : Colors.cyan,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.go('/'),
         ),
         actions: [
-          if (_selectedImages.isNotEmpty)
+          if (_isMultiSelectMode)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: _removeSelectedImages,
+              tooltip: '선택된 이미지 삭제',
+            )
+          else if (_selectedImages.isNotEmpty)
             IconButton(
               icon: const Icon(Icons.cloud_upload),
               onPressed: _uploadImages,
@@ -179,13 +182,25 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ),
                 itemCount: _selectedImages.length,
                 itemBuilder: (context, index) {
+                  final isSelected = _selectedForDeletion.contains(index);
                   return GestureDetector(
-                    onTap: () => _showFullImage(_selectedImages[index]),
+                    onLongPress: () {
+                      setState(() {
+                        _isMultiSelectMode = true;
+                        _toggleMultiSelect(index);
+                      });
+                    },
+                    onTap: _isMultiSelectMode
+                        ? () => _toggleMultiSelect(index)
+                        : () => _showFullImage(_selectedImages[index]),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
                         Container(
                           decoration: BoxDecoration(
+                            border: isSelected
+                                ? Border.all(color: Colors.redAccent, width: 3)
+                                : null,
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: const [
                               BoxShadow(
@@ -205,25 +220,16 @@ class _GalleryScreenState extends State<GalleryScreen> {
                             ),
                           ),
                         ),
-                        Positioned(
-                          top: -8,
-                          right: -8,
-                          child: GestureDetector(
-                            onTap: () => _removeImage(index),
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.redAccent,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                color: Colors.white,
-                                size: 20,
-                              ),
+                        if (isSelected)
+                          Positioned(
+                            top: 4,
+                            right: 4,
+                            child: Icon(
+                              Icons.check_circle,
+                              color: Colors.redAccent,
+                              size: 24,
                             ),
                           ),
-                        ),
                       ],
                     ),
                   );
