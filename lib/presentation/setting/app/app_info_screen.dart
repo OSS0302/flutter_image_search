@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
@@ -46,27 +45,32 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     });
   }
 
+  void _sendFeedback() async {
+    final Uri emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'support@example.com',
+      query: 'subject=App Feedback ($_appName)&body=Write your feedback here...',
+    );
+    if (await canLaunchUrl(emailLaunchUri)) {
+      await launchUrl(emailLaunchUri);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('이메일 클라이언트를 열 수 없습니다.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: _isDarkMode ? ThemeData.dark(useMaterial3: true) : ThemeData.light(useMaterial3: true),
       home: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Scaffold(
           appBar: AppBar(
             title: const Text('앱 정보'),
-            backgroundColor: _isDarkMode ? Colors.grey[900]! : Colors.cyan!,
+            backgroundColor: _isDarkMode ? Colors.grey[900]! : Colors.cyan,
             elevation: 2,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                if (Navigator.canPop(context)) {
-                  context.pop(context);
-                } else {
-                  context.go('/ProfileScreen');
-                }
-              },
-            ),
             actions: [
               IconButton(
                 icon: Icon(
@@ -83,19 +87,17 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
               ),
               tabs: const [
                 Tab(icon: Icon(Icons.info), text: '앱 정보'),
+                Tab(icon: Icon(Icons.featured_play_list), text: '앱 기능'),
                 Tab(icon: Icon(Icons.person), text: '개발자 정보'),
               ],
             ),
           ),
-          body: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: TabBarView(
-              key: ValueKey<bool>(_isDarkMode),
-              children: [
-                _buildAppInfoTab(),
-                _buildDeveloperInfoTab(),
-              ],
-            ),
+          body: TabBarView(
+            children: [
+              _buildAppInfoTab(),
+              _buildFeaturesTab(),
+              _buildDeveloperInfoTab(),
+            ],
           ),
         ),
       ),
@@ -121,24 +123,12 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
           const SizedBox(height: 16),
           _buildInfoTile('버전', '$_version (Build $_buildNumber)'),
           const SizedBox(height: 16),
-          _buildInfoTile(
-            '라이선스',
-            '오픈소스 라이선스 보기',
-            onTap: () {
-              showLicensePage(
-                context: context,
-                applicationName: _appName,
-                applicationVersion: '$_version (Build $_buildNumber)',
-              );
-            },
-          ),
+          _buildInfoTile('지원 플랫폼', 'iOS, Android'),
           const SizedBox(height: 16),
           ElevatedButton.icon(
-            onPressed: () {
-              Share.share('앱 이름: $_appName\n버전: $_version (Build $_buildNumber)');
-            },
-            icon: const Icon(Icons.share),
-            label: const Text('앱 정보 공유'),
+            onPressed: _sendFeedback,
+            icon: const Icon(Icons.email),
+            label: const Text('피드백 보내기'),
             style: ElevatedButton.styleFrom(
               backgroundColor: _isDarkMode ? Colors.tealAccent : Colors.cyan,
               shape: RoundedRectangleBorder(
@@ -157,12 +147,37 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
     );
   }
 
+  Widget _buildFeaturesTab() {
+    return ListView(
+      padding: const EdgeInsets.all(16.0),
+      children: [
+        _buildFeatureTile('다크 모드 지원', Icons.dark_mode),
+        _buildFeatureTile('QR 코드 생성', Icons.qr_code),
+        _buildFeatureTile('정보 공유 기능', Icons.share),
+        _buildFeatureTile('피드백 전송', Icons.email),
+      ],
+    );
+  }
+
+  Widget _buildFeatureTile(String feature, IconData icon) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 4,
+      child: ListTile(
+        leading: Icon(icon, color: _isDarkMode ? Colors.tealAccent : Colors.cyan),
+        title: Text(
+          feature,
+          style: TextStyle(color: _isDarkMode ? Colors.white : Colors.black87),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDeveloperInfoTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          const SizedBox(height: 16),
           _buildContactCard(
             title: '개발자 이메일',
             value: 'developer@example.com',
@@ -173,12 +188,6 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
             title: '웹사이트',
             value: 'https://example.com',
             icon: Icons.web,
-          ),
-          const SizedBox(height: 16),
-          _buildContactCard(
-            title: '고객 지원 전화',
-            value: '+82-10-1234-5678',
-            icon: Icons.phone,
           ),
           const SizedBox(height: 24),
           Row(
@@ -209,21 +218,7 @@ class _AppInfoScreenState extends State<AppInfoScreen> {
         CircleAvatar(
           radius: 40,
           backgroundColor: _isDarkMode ? Colors.teal[700]! : Colors.teal[100]!,
-          child: ClipOval(
-            child: Image.network(
-              'https://example.com/image.png',
-              fit: BoxFit.cover,
-              width: 80,
-              height: 80,
-              errorBuilder: (context, error, stackTrace) {
-                return Icon(
-                  Icons.error,
-                  color: _isDarkMode ? Colors.white : Colors.red,
-                  size: 40,
-                );
-              },
-            ),
-          ),
+          child: const Icon(Icons.info, size: 40, color: Colors.white),
         ),
         const SizedBox(width: 16),
         Expanded(
