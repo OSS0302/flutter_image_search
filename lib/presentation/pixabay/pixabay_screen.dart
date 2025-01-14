@@ -5,7 +5,6 @@ import 'package:image_search_app/presentation/pixabay/pixabay_event.dart';
 import 'package:image_search_app/presentation/pixabay/pixabay_view_model.dart';
 import 'package:provider/provider.dart';
 import '../../main.dart';
-import '../widget/pixabay_widget.dart';
 
 class PixabayScreen extends StatefulWidget {
   const PixabayScreen({super.key});
@@ -16,7 +15,9 @@ class PixabayScreen extends StatefulWidget {
 
 class _PixabayScreenState extends State<PixabayScreen> {
   final textEditingController = TextEditingController();
+  final List<String> searchHistory = [];
   StreamSubscription<PixabayEvent>? subscription;
+  String sortOption = 'Relevance'; // 기본 정렬 옵션
 
   @override
   void initState() {
@@ -71,9 +72,17 @@ class _PixabayScreenState extends State<PixabayScreen> {
   }
 
   Future<void> _searchImages(BuildContext context) async {
+    final query = textEditingController.text.trim();
+    if (query.isEmpty) {
+      return;
+    }
     final pixabayViewModel = context.read<PixabayViewModel>();
-    await pixabayViewModel.fetchImage(textEditingController.text);
-    setState(() {});
+    await pixabayViewModel.fetchImage(query);
+    setState(() {
+      if (!searchHistory.contains(query)) {
+        searchHistory.add(query);
+      }
+    });
   }
 
   @override
@@ -98,9 +107,18 @@ class _PixabayScreenState extends State<PixabayScreen> {
           },
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search_rounded),
-            onPressed: () => _searchImages(context),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              setState(() {
+                sortOption = value;
+              });
+            },
+            icon: const Icon(Icons.sort),
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'Relevance', child: Text('Relevance')),
+              const PopupMenuItem(value: 'Popular', child: Text('Popular')),
+              const PopupMenuItem(value: 'Latest', child: Text('Latest')),
+            ],
           ),
           IconButton(
             icon: isDarkMode
@@ -128,33 +146,58 @@ class _PixabayScreenState extends State<PixabayScreen> {
                 elevation: 8,
                 shadowColor: isDarkMode ? Colors.teal : Colors.grey[200],
                 borderRadius: BorderRadius.circular(20),
-                child: TextField(
-                  controller: textEditingController,
-                  decoration: InputDecoration(
-                    labelText: 'Search images...',
-                    labelStyle: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.teal[700],
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: textEditingController,
+                      decoration: InputDecoration(
+                        labelText: 'Search images...',
+                        labelStyle: TextStyle(
+                          color: isDarkMode ? Colors.white70 : Colors.teal[700],
+                        ),
+                        filled: true,
+                        fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.search_rounded),
+                          color: Colors.teal,
+                          onPressed: () => _searchImages(context),
+                        ),
+                      ),
                     ),
-                    filled: true,
-                    fillColor: isDarkMode ? Colors.grey[800] : Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: const Icon(Icons.search_rounded),
-                      color: Colors.teal,
-                      onPressed: () => _searchImages(context),
-                    ),
-                  ),
+                    if (searchHistory.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        height: 50,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: searchHistory.map((query) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  textEditingController.text = query;
+                                  _searchImages(context);
+                                },
+                                child: Chip(
+                                  label: Text(query),
+                                  backgroundColor: Colors.teal[100],
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(height: 16),
               Expanded(
                 child: state.isLoading
-                    ? const Center(
-                  child: CircularProgressIndicator(),
-                )
+                    ? const Center(child: CircularProgressIndicator())
                     : state.pixabayItem.isEmpty
                     ? Center(
                   child: Text(
@@ -208,7 +251,8 @@ class _PixabayScreenState extends State<PixabayScreen> {
                                     fit: BoxFit.cover,
                                     width: double.infinity,
                                     height: double.infinity,
-                                    loadingBuilder: (context, child,
+                                    loadingBuilder:
+                                        (context, child,
                                         loadingProgress) {
                                       if (loadingProgress == null) {
                                         return child;
