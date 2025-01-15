@@ -12,35 +12,70 @@ class ChangePasswordScreen extends StatefulWidget {
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   final TextEditingController _currentPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _isObscureCurrent = true;
+  bool _isObscureNew = true;
+  bool _isObscureConfirm = true;
+  String _passwordStrength = '';
 
   @override
   void dispose() {
     _currentPasswordController.dispose();
     _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   void _changePassword() {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('비밀번호가 변경되었습니다.')),
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: const Text('성공'),
+          content: const Text('비밀번호가 성공적으로 변경되었습니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        ),
       );
-      Navigator.pop(context);
     }
+  }
+
+  void _checkPasswordStrength(String value) {
+    String strength;
+    if (value.isEmpty) {
+      strength = '';
+    } else if (value.length < 6) {
+      strength = '약함';
+    } else if (value.contains(RegExp(r'[A-Z]')) && value.contains(RegExp(r'[0-9]'))) {
+      strength = '강함';
+    } else {
+      strength = '보통';
+    }
+
+    setState(() {
+      _passwordStrength = strength;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // 다크모드 상태 가져오기
     final isDarkMode = MyApp.themeNotifier.value == ThemeMode.dark;
 
-    // 배경 색상 설정
     final backgroundColor = BoxDecoration(
       gradient: LinearGradient(
         colors: isDarkMode
-            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)] // 다크모드 색상
-            : [const Color(0xFF00BCD4), const Color(0xFF8E24AA)], // 라이트모드 색상
+            ? [const Color(0xFF121212), const Color(0xFF1E1E1E)]
+            : [const Color(0xFF00BCD4), const Color(0xFF8E24AA)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
@@ -83,47 +118,60 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
+                      _buildPasswordField(
                         controller: _currentPasswordController,
-                        decoration: InputDecoration(
-                          labelText: '현재 비밀번호',
-                          prefixIcon: Icon(Icons.lock, color: isDarkMode ? Colors.teal : Colors.cyan),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: cardColor,
-                          labelStyle: TextStyle(color: textColor),
-                        ),
-                        style: TextStyle(color: textColor),
-                        obscureText: true,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return '현재 비밀번호를 입력하세요.';
-                          }
-                          return null;
+                        label: '현재 비밀번호',
+                        isObscure: _isObscureCurrent,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _isObscureCurrent = !_isObscureCurrent;
+                          });
                         },
+                        textColor: textColor,
+                        cardColor: cardColor,
                       ),
                       const SizedBox(height: 16),
-                      TextFormField(
+                      _buildPasswordField(
                         controller: _newPasswordController,
-                        decoration: InputDecoration(
-                          labelText: '새 비밀번호',
-                          prefixIcon: Icon(Icons.lock_outline, color: isDarkMode ? Colors.teal : Colors.cyan),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          filled: true,
-                          fillColor: cardColor,
-                          labelStyle: TextStyle(color: textColor),
+                        label: '새 비밀번호',
+                        isObscure: _isObscureNew,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _isObscureNew = !_isObscureNew;
+                          });
+                        },
+                        textColor: textColor,
+                        cardColor: cardColor,
+                        onChanged: _checkPasswordStrength,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '비밀번호 강도: $_passwordStrength',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: _passwordStrength == '강함'
+                              ? Colors.green
+                              : (_passwordStrength == '보통'
+                              ? Colors.orange
+                              : Colors.red),
                         ),
-                        style: TextStyle(color: textColor),
-                        obscureText: true,
+                      ),
+                      const SizedBox(height: 16),
+                      _buildPasswordField(
+                        controller: _confirmPasswordController,
+                        label: '비밀번호 확인',
+                        isObscure: _isObscureConfirm,
+                        onVisibilityToggle: () {
+                          setState(() {
+                            _isObscureConfirm = !_isObscureConfirm;
+                          });
+                        },
+                        textColor: textColor,
+                        cardColor: cardColor,
                         validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return '새 비밀번호를 입력하세요.';
-                          } else if (value.length < 6) {
-                            return '비밀번호는 6자 이상이어야 합니다.';
+                          if (value != _newPasswordController.text) {
+                            return '비밀번호가 일치하지 않습니다.';
                           }
                           return null;
                         },
@@ -153,6 +201,45 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPasswordField({
+    required TextEditingController controller,
+    required String label,
+    required bool isObscure,
+    required VoidCallback onVisibilityToggle,
+    required Color textColor,
+    required Color cardColor,
+    ValueChanged<String>? onChanged,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: const Icon(Icons.lock),
+        suffixIcon: IconButton(
+          icon: Icon(isObscure ? Icons.visibility_off : Icons.visibility),
+          onPressed: onVisibilityToggle,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        filled: true,
+        fillColor: cardColor,
+        labelStyle: TextStyle(color: textColor),
+      ),
+      obscureText: isObscure,
+      style: TextStyle(color: textColor),
+      onChanged: onChanged,
+      validator: validator ??
+              (value) {
+            if (value == null || value.isEmpty) {
+              return '$label을(를) 입력하세요.';
+            }
+            return null;
+          },
     );
   }
 }
