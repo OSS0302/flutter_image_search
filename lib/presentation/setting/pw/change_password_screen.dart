@@ -81,7 +81,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       ),
     );
 
-    final cardColor = isDarkMode ? Colors.grey[900] : Colors.grey[100];
+    final cardColor = isDarkMode ? Colors.grey[900] ?? Colors.black : Colors.grey[100] ?? Colors.white;
     final textColor = isDarkMode ? Colors.white70 : Colors.black87;
 
     return Scaffold(
