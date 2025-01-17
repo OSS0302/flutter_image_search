@@ -46,7 +46,14 @@ class _AlarmScreenState extends State<AlarmScreen>
       try {
         final List<dynamic> decodedData = json.decode(savedAlarms);
         setState(() {
-          _alarms.addAll(decodedData.map((e) => Map<String, dynamic>.from(e)));
+          _alarms.addAll(decodedData.map((e) {
+            // repeatDays를 List<bool>로 변환
+            final repeatDays = (e['repeatDays'] as List<dynamic>).map((day) => day as bool).toList();
+            return {
+              ...e,
+              'repeatDays': repeatDays,
+            };
+          }));
         });
       } catch (e) {
         debugPrint('알람 로드 오류: $e');
