@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageSettingsScreen extends StatefulWidget {
-  const LanguageSettingsScreen({super.key});
+  const LanguageSettingsScreen({Key? key}) : super(key: key);
 
   @override
-  State<LanguageSettingsScreen> createState() =>
-      _LanguageSettingsScreenState();
+  State<LanguageSettingsScreen> createState() => _LanguageSettingsScreenState();
 }
 
 class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
-  String _selectedLanguage = '한국어'; // 기본 언어 설정
+  String _selectedLanguage = '한국어';
   final List<String> _languages = [
     '한국어',
     'English',
@@ -22,7 +22,52 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     'Português',
     'Русский'
   ];
+  final Map<String, String> _languageFlags = {
+    '한국어': '🇰🇷',
+    'English': '🇺🇸',
+    'Español': '🇪🇸',
+    '日本語': '🇯🇵',
+    '中文': '🇨🇳',
+    'Français': '🇫🇷',
+    'Deutsch': '🇩🇪',
+    'Italiano': '🇮🇹',
+    'Português': '🇵🇹',
+    'Русский': '🇷🇺',
+  };
   String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLanguagePreference();
+  }
+
+  Future<void> _loadLanguagePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _selectedLanguage = prefs.getString('selectedLanguage') ?? '한국어';
+    });
+  }
+
+  Future<void> _saveLanguagePreference(String language) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedLanguage', language);
+  }
+
+  void _changeLanguage(String language) {
+    setState(() {
+      _selectedLanguage = language;
+    });
+    _saveLanguagePreference(language);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('언어가 "$language"(으)로 변경되었습니다.'),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +83,11 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         title: const Text('언어 설정'),
         centerTitle: true,
         backgroundColor: isDarkMode ? Colors.black : Colors.teal,
-        elevation: 4,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // 상단 선택된 언어 표시
           Container(
-            width: double.infinity,
             color: isDarkMode ? Colors.grey[900] : Colors.teal[100],
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
             child: Text(
@@ -57,7 +99,6 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
             ),
           ),
-          // 검색창
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -78,33 +119,17 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               ),
             ),
           ),
-          // 언어 리스트
           Expanded(
             child: ListView.builder(
-              physics: const BouncingScrollPhysics(),
               itemCount: filteredLanguages.length,
               itemBuilder: (context, index) {
                 final language = filteredLanguages[index];
                 final isSelected = _selectedLanguage == language;
 
                 return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedLanguage = language;
-                    });
-                    // SnackBar 표시
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('언어가 "$language"(으)로 변경되었습니다.'),
-                        behavior: SnackBarBehavior.floating,
-                        duration: const Duration(seconds: 2),
-                        margin: const EdgeInsets.all(16),
-                      ),
-                    );
-                  },
+                  onTap: () => _changeLanguage(language),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
                     margin: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     padding: const EdgeInsets.all(16.0),
@@ -117,35 +142,31 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
                         color: isSelected
                             ? (isDarkMode ? Colors.tealAccent : Colors.teal)
                             : Colors.transparent,
-                        width: 2,
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black12,
-                          blurRadius: isSelected ? 8 : 4,
-                          offset: const Offset(2, 4),
-                        ),
-                      ],
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Text(
+                          _languageFlags[language] ?? '🌐',
+                          style: const TextStyle(fontSize: 24),
+                        ),
+                        const SizedBox(width: 16),
                         Text(
                           language,
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color:
-                            isDarkMode ? Colors.white : Colors.black87,
+                            color: isDarkMode ? Colors.white : Colors.black87,
                           ),
                         ),
+                        if (isSelected)
+                          const Spacer(),
                         if (isSelected)
                           Icon(
                             Icons.check_circle,
                             color: isDarkMode
                                 ? Colors.tealAccent
                                 : Colors.teal,
-                            size: 24,
                           ),
                       ],
                     ),
