@@ -9,7 +9,10 @@ class LanguageSettingsScreen extends StatefulWidget {
 }
 
 class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
+  late Future<String> _selectedLanguageFuture;
   String _selectedLanguage = '한국어';
+  String _searchQuery = '';
+
   final List<String> _languages = [
     '한국어',
     'English',
@@ -22,6 +25,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     'Português',
     'Русский'
   ];
+
   final Map<String, String> _languageFlags = {
     '한국어': '🇰🇷',
     'English': '🇺🇸',
@@ -34,19 +38,16 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     'Português': '🇵🇹',
     'Русский': '🇷🇺',
   };
-  String _searchQuery = '';
 
   @override
   void initState() {
     super.initState();
-    _loadLanguagePreference();
+    _selectedLanguageFuture = _loadLanguagePreference();
   }
 
-  Future<void> _loadLanguagePreference() async {
+  Future<String> _loadLanguagePreference() async {
     final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _selectedLanguage = prefs.getString('selectedLanguage') ?? '한국어';
-    });
+    return prefs.getString('selectedLanguage') ?? '한국어';
   }
 
   Future<void> _saveLanguagePreference(String language) async {
@@ -72,11 +73,6 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final filteredLanguages = _languages
-        .where((language) => language
-        .toLowerCase()
-        .contains(_searchQuery.toLowerCase()))
-        .toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -84,98 +80,119 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
         centerTitle: true,
         backgroundColor: isDarkMode ? Colors.black : Colors.teal,
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            color: isDarkMode ? Colors.grey[900] : Colors.teal[100],
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            child: Text(
-              '선택된 언어: $_selectedLanguage',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: isDarkMode ? Colors.tealAccent : Colors.teal[800],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: '언어 검색...',
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+      body: FutureBuilder<String>(
+        future: _selectedLanguageFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('언어 설정을 불러오는 중 오류가 발생했습니다.'),
+            );
+          }
+
+          _selectedLanguage = snapshot.data ?? '한국어';
+
+          final filteredLanguages = _languages
+              .where((language) => language
+              .toLowerCase()
+              .contains(_searchQuery.toLowerCase()))
+              .toList();
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                color: isDarkMode ? Colors.grey[900] : Colors.teal[100],
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                child: Text(
+                  '선택된 언어: $_selectedLanguage',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDarkMode ? Colors.tealAccent : Colors.teal[800],
+                  ),
                 ),
               ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredLanguages.length,
-              itemBuilder: (context, index) {
-                final language = filteredLanguages[index];
-                final isSelected = _selectedLanguage == language;
-
-                return GestureDetector(
-                  onTap: () => _changeLanguage(language),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(
-                        horizontal: 16.0, vertical: 8.0),
-                    padding: const EdgeInsets.all(16.0),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? (isDarkMode ? Colors.teal[800] : Colors.teal[100])
-                          : (isDarkMode ? Colors.grey[850] : Colors.white),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: '언어 검색...',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                    border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected
-                            ? (isDarkMode ? Colors.tealAccent : Colors.teal)
-                            : Colors.transparent,
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          _languageFlags[language] ?? '🌐',
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          language,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: isDarkMode ? Colors.white : Colors.black87,
-                          ),
-                        ),
-                        if (isSelected)
-                          const Spacer(),
-                        if (isSelected)
-                          Icon(
-                            Icons.check_circle,
-                            color: isDarkMode
-                                ? Colors.tealAccent
-                                : Colors.teal,
-                          ),
-                      ],
+                      borderSide: BorderSide.none,
                     ),
                   ),
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredLanguages.length,
+                  itemBuilder: (context, index) {
+                    final language = filteredLanguages[index];
+                    final isSelected = _selectedLanguage == language;
+
+                    return GestureDetector(
+                      onTap: () => _changeLanguage(language),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 16.0, vertical: 8.0),
+                        padding: const EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? (isDarkMode ? Colors.teal[800] : Colors.teal[100])
+                              : (isDarkMode ? Colors.grey[850] : Colors.white),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? (isDarkMode ? Colors.tealAccent : Colors.teal)
+                                : Colors.transparent,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              _languageFlags[language] ?? '🌐',
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Text(
+                                language,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDarkMode ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                            ),
+                            if (isSelected)
+                              Icon(
+                                Icons.check_circle,
+                                color: isDarkMode ? Colors.tealAccent : Colors.teal,
+                              ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
