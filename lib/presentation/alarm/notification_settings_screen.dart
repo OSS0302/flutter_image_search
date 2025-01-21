@@ -87,11 +87,8 @@ class _NotificationSettingsScreenState
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
+            // 홈 화면으로 이동
+            context.go('/');
           },
         ),
       ),
@@ -251,7 +248,8 @@ class _NotificationSettingsScreenState
               }
                   : null,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.teal // 선택된 요일의 배경색
@@ -275,7 +273,6 @@ class _NotificationSettingsScreenState
       ],
     );
   }
-
 
   Widget _buildSwitchTile({
     required String title,
