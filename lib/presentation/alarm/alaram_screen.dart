@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AlarmScreen extends StatefulWidget {
@@ -235,6 +236,10 @@ class _AlarmScreenState extends State<AlarmScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/'),
+        ),
         title: const Text('알람 설정'),
         bottom: TabBar(
           controller: _tabController,
@@ -242,6 +247,7 @@ class _AlarmScreenState extends State<AlarmScreen>
             Tab(text: '활성'),
             Tab(text: '비활성'),
           ],
+
         ),
       ),
       body: TabBarView(
