@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -166,6 +167,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       home: Scaffold(
         backgroundColor: _backgroundColor,
         appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.go('/'),
+          ),
           title: Text('내 프로필'),
           actions: [
             IconButton(
