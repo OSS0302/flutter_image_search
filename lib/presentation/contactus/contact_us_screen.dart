@@ -30,25 +30,47 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     return filledFields / 4;
   }
 
+  // 이미지 파일 선택
   Future<void> _pickFile() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      setState(() {
-        _selectedFile = File(pickedFile.path);
-      });
+      final file = File(pickedFile.path);
+      final fileSize = await file.length();
+
+      // 파일 크기 제한 (예: 5MB 이하)
+      if (fileSize > 5 * 1024 * 1024) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('파일 크기는 5MB 이하로 첨부해야 합니다.'),
+          ),
+        );
+      } else {
+        // 파일 형식 확인
+        final fileExtension = file.path.split('.').last.toLowerCase();
+        final allowedExtensions = ['jpg', 'jpeg', 'png'];
+
+        if (!allowedExtensions.contains(fileExtension)) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('허용되지 않는 파일 형식입니다. JPG, JPEG, PNG 형식만 가능합니다.'),
+            ),
+          );
+        } else {
+          setState(() {
+            _selectedFile = file;
+          });
+        }
+      }
     }
   }
 
+  // 문의 전송 처리
   void _submitFeedback() async {
     if (!_formKey.currentState!.validate() || !_isAgreed) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
-            '모든 필드를 작성하고 동의란에 체크해주세요.',
-            style: TextStyle(fontSize: 16),
-          ),
-          behavior: SnackBarBehavior.floating,
+          content: const Text('모든 필드를 작성하고 동의란에 체크해주세요.'),
         ),
       );
       return;
@@ -67,16 +89,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       _isSubmitting = false;
     });
 
+    // 문의 전송 후 알림 표시
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
-        content: Text(
-          '문의가 성공적으로 전송되었습니다!',
-          style: TextStyle(fontSize: 16),
-        ),
-        behavior: SnackBarBehavior.floating,
+        content: Text('문의가 성공적으로 전송되었습니다!'),
       ),
     );
 
+    // 폼 초기화
     _formKey.currentState!.reset();
     _nameController.clear();
     _emailController.clear();
@@ -88,6 +108,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     });
   }
 
+  // 확인 다이얼로그
   Future<bool> _showConfirmationDialog() async {
     return await showDialog(
       context: context,
@@ -107,8 +128,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           ],
         );
       },
-    ) ??
-        false;
+    ) ?? false;
   }
 
   @override
@@ -207,9 +227,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                       icon: const Icon(Icons.attach_file),
                       label: const Text('파일 첨부'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: isDarkMode
-                            ? Colors.tealAccent
-                            : Colors.cyan,
+                        backgroundColor: isDarkMode ? Colors.tealAccent : Colors.cyan,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -226,9 +244,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                             child: Text(
                               _selectedFile!.path.split('/').last,
                               style: TextStyle(
-                                color: isDarkMode
-                                    ? Colors.white
-                                    : Colors.black87,
+                                color: isDarkMode ? Colors.white : Colors.black87,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
